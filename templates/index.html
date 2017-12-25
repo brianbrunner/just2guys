@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+  {% for league in leagues %}
+    <a href='/league/{{ league.key }}'>{{ league.name }}</a>
+  {% endfor %}
+{% endblock %}

@@ -62,6 +62,18 @@ class API(object):
       self.process_team(team) for team in tree.findall(".//yh:team", self._ns)
     ]
 
+  def get_matchups(self, league_key):
+    return [
+      self.get_matchup(league_key, i) for i in range(1,17)
+    ]
+
+  def get_matchup(self, league_key, week):
+    logger.info("Getting matchup info for %s for week %s...", league_key, week)
+    tree = self.get_league_resource(league_key, 'scoreboard;week=1/matchups')
+    return [
+      self.process_matchup(matchup) for matchup in tree.findall(".//yh:matchup", self._ns)
+    ]
+
   def get_team_matchups(self, team_key):
       tree = self.get_team_resource(team_key, 'matchups')
       return [
@@ -70,14 +82,27 @@ class API(object):
 
   def get_team_rosters(self, team_key):
     return [
-      self.get_team_roster(team_key, i) for i in range(1,16)
+      self.get_team_roster(team_key, i) for i in range(1,17)
     ]
 
   def get_team_roster(self, team_key, week):
-    return self.process_roster(self.get_team_resource(team_key, 'roster;week=%s' % week))
+    logger.info("Getting roster info for %s for week %s...", team_key, week)
+    return self.process_roster(self.get_team_resource(team_key, 'players;week=%s/stats;type=week;week=%s' % (week, week)))
 
   def process_roster(self, tree):
-    players = 
+    return [
+      self.process_player(player) for player in tree.findall(".//yh:player", self._ns)
+    ]
+
+  def process_player(self, tree):
+    return {
+      'key': tree.find("./yh:player_key", self._ns).text,
+      'id': tree.find("./yh:player_id", self._ns).text,
+      'name': tree.find("./yh:name", self._ns).find("./yh:full", self._ns).text,
+      'display_position': tree.find("./yh:display_position", self._ns).text,
+      'image_url': tree.find("./yh:image_url", self._ns).text,
+      'points': float(tree.find("./yh:player_points", self._ns).find("./yh:total", self._ns).text)
+    }
 
   def get_scoreboard(self, league_key, week):
     tree = self.get_league_resource(league_key, 'scoreboard;week=%s' % week)
@@ -133,6 +158,7 @@ if __name__ == "__main__":
 
     league_info = {
       "name": league['name'],
+      "key": league['key']
     }
 
     teams = api.get_league_teams(league['key'])
@@ -142,13 +168,18 @@ if __name__ == "__main__":
     }
 
     for team in teams:
-      logger.info("Fetching info for team %s in league %s (%s)...", team['name'], league['name'], league['season'])
+      logger.info("Fetching matchup info for team %s in league %s (%s)...", team['name'], league['name'], league['season'])
       team['matchups'] = api.get_team_matchups(team['key'])
+      logger.info("Fetching roster info for team %s in league %s (%s)...", team['name'], league['name'], league['season'])
       team['rosters'] = api.get_team_rosters(team['key'])
 
     league_info['teams'] = teams
 
+    logger.info("Fetching matchups for league %s (%s)...", league['name'], league['season'])
+    league_info['matchups'] = api.get_matchups(league['key'])
+
     league_infos.append(league_info)
     break
 
-  print(json.dumps(league_infos, indent=1))
+  with open('leagues.json', 'w') as league_file:
+    league_file.write(json.dumps(league_infos, indent=1))

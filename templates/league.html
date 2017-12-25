@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  {% for team in league.teams %}
+    <div class='team'>
+      <img src='{{ team.logos[0] }}' />
+      <a href='/team/{{ team.key }}'>{{ team.name }}</a>
+    </div>
+  {% endfor %}
+{% endblock %}
