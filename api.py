@@ -69,7 +69,7 @@ class API(object):
 
   def get_matchup(self, league_key, week):
     logger.info("Getting matchup info for %s for week %s...", league_key, week)
-    tree = self.get_league_resource(league_key, 'scoreboard;week=1/matchups')
+    tree = self.get_league_resource(league_key, 'scoreboard;week=%s/matchups;/teams;/roster' % week)
     return [
       self.process_matchup(matchup) for matchup in tree.findall(".//yh:matchup", self._ns)
     ]
@@ -87,7 +87,8 @@ class API(object):
 
   def get_team_roster(self, team_key, week):
     logger.info("Getting roster info for %s for week %s...", team_key, week)
-    return self.process_roster(self.get_team_resource(team_key, 'players;week=%s/stats;type=week;week=%s' % (week, week)))
+    tree = self.get_team_resource(team_key, 'players;week=%s/stats;type=week;week=%s' % (week, week))
+    return self.process_roster(tree)
 
   def process_roster(self, tree):
     return [
@@ -95,24 +96,29 @@ class API(object):
     ]
 
   def process_player(self, tree):
-    return {
+    player = {
       'key': tree.find("./yh:player_key", self._ns).text,
       'id': tree.find("./yh:player_id", self._ns).text,
       'name': tree.find("./yh:name", self._ns).find("./yh:full", self._ns).text,
       'display_position': tree.find("./yh:display_position", self._ns).text,
+      'position_type': tree.find("./yh:display_position", self._ns).text,
       'image_url': tree.find("./yh:image_url", self._ns).text,
-      'points': float(tree.find("./yh:player_points", self._ns).find("./yh:total", self._ns).text)
     }
+    if tree.find("./yh:player_points", self._ns):
+      player['points'] = float(tree.find("./yh:player_points", self._ns).find("./yh:total", self._ns).text)
+    if (tree.find("./yh:selected_position", self._ns)):
+      player['selected_position'] = tree.find("./yh:selected_position", self._ns).find("./yh:position", self._ns).text
+    return player
 
   def get_scoreboard(self, league_key, week):
     tree = self.get_league_resource(league_key, 'scoreboard;week=%s' % week)
     matchups = [
       self.process_matchup(matchup) for matchup in tree.findall(".//yh:matchup", self._ns)
     ]
-    return
+    return matchups
 
   def process_team(self, tree):
-    return {
+    team = {
       'id': tree.find('./yh:team_id', self._ns).text,
       'key': tree.find('./yh:team_key', self._ns).text,
       'name': tree.find('./yh:name', self._ns).text,
@@ -122,11 +128,19 @@ class API(object):
           'id': manager.find('.//yh:manager_id', self._ns).text,
           'nickname': manager.find('.//yh:nickname', self._ns).text
         } for manager in tree.findall('./yh:managers', self._ns)
+      ],
+      'roster': [
+        self.process_player(player) for player in tree.findall(".//yh:player", self._ns)
       ]
     }
+    if tree.find('./yh:team_projected_points', self._ns):
+      team['projected_points'] = float(tree.find('./yh:team_projected_points', self._ns).find('./yh:total', self._ns).text)
+    if tree.find('./yh:team_points', self._ns):
+      team['team_points'] = float(tree.find('./yh:team_points', self._ns).find('./yh:total', self._ns).text)
+    return team
 
   def process_matchup(self, tree):
-    return {
+    matchup = {
       'week': tree.find('./yh:week', self._ns).text,
       'is_playoffs': tree.find('./yh:is_playoffs', self._ns).text == '1',
       'is_consolation': tree.find('./yh:is_consolation', self._ns).text == '1',
@@ -135,6 +149,8 @@ class API(object):
         self.process_team(team) for team in tree.findall('.//yh:team', self._ns)
       ]
     }
+    matchup['key'] = '%s.%s' % (matchup['week'], '.'.join(sorted([matchup['teams'][0]['key'], matchup['teams'][1]['key']])))
+    return matchup
       
   def get_league_resource(self, league_key, resource):
     return self._make_req('league/%s/%s' % (league_key, resource))
@@ -181,5 +197,5 @@ if __name__ == "__main__":
     league_infos.append(league_info)
     break
 
-  with open('leagues.json', 'w') as league_file:
+  with open('leagues-raw.json', 'w') as league_file:
     league_file.write(json.dumps(league_infos, indent=1))

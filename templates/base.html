@@ -2,8 +2,20 @@
 <html>
 <head>
   <title>Just 2 Guys</title>
+  <link rel='stylesheet' href='/static/css/style.css'>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
 </head>
 <body>
-  {% block content %}{% endblock %}
+  <div class='nav-wrap'>
+    <nav>
+      <div class='logo'>
+        Just 2 Guys
+      </div>
+    </nav>
+  </div>
+  <div class='content'>
+    {% block content %}{% endblock %}
+  </div>
 </body>
 </html>

@@ -1,0 +1,46 @@
+* {
+  margin: 0;
+  padding: 0; }
+
+a, a:visited, a:active, a:hover {
+  text-decoration: none;
+  color: #333; }
+
+.nav-wrap {
+  background-color: #3333ff;
+  width: 100%; }
+  .nav-wrap nav {
+    max-width: 900px;
+    margin: auto;
+    color: #fff; }
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  color: #333;
+  background-color: #f0f0f0; }
+
+.content {
+  max-width: 900px;
+  padding: 20px;
+  margin: auto; }
+
+table {
+  width: 100%;
+  border-spacing: 0;
+  background-color: #fff; }
+  table thead {
+    background-color: #e63330;
+    color: #fff; }
+  table tr td, table tr th {
+    box-sizing: border-box;
+    text-align: left;
+    padding: 10px 15px; }
+  table tr:nth-child(even) {
+    background-color: #f7f7f7; }
+  table.teams img {
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    border-radius: 50%; }
+
+/*# sourceMappingURL=style.css.map */

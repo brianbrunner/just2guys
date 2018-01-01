@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class='matchup-title'>
+    <div class='matchup-team left'>
+      <img src='{{ matchup.teams.0.logos.0 }}' />
+      <a href='/{{ matchup.teams.0|team_link(league) }}'>{{ matchup.teams.0.name }}</a>
+    </div>
+    <div class='matchup-team left'>
+      <img src='{{ matchup.teams.1.logos.0 }}' />
+      <a href='/{{ matchup.teams.1|team_link(league) }}'>{{ matchup.teams.1.name }}</a>
+    </div>
+  </div>
+  <div class='matchup-rosters'>
+    <div class='matchup-roster left'>
+      {% for player in rosters.0 %}
+        <div class='player'>
+          <a href='/{{ player|player_link(league) }}'>{{ player.name }}</a>
+        </div>
+      {% endfor %}
+      {% for player in rosters.1 %}
+        <div class='player'>
+          <a class='name' href='/{{ player|player_link(league) }}'>{{ player.name }}</a>
+          <span class='position'>{{ player.display_position }}</span>
+          <span class='points'>{{ player.points }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

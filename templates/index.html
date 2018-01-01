@@ -1,6 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
-  {% for league in leagues %}
-    <a href='/league/{{ league.key }}'>{{ league.name }}</a>
-  {% endfor %}
+  <table class='table'>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th># Teams</th>
+        <th>1st Place</th>
+        <th>2nd Place</th>
+        <th>3rd Place</th>
+        <th>Last Place</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for league in leagues %}
+        <tr>
+          <td>
+            <a href='/{{ league | league_link }}'>{{ league.name }}</a>
+          </td>
+          <td>{{ league.num_teams }}</td>
+          <td>
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
+        </tr> 
+      {% endfor %}
+    </tbody>
+  <table>
 {% endblock %}

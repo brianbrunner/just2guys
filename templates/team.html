@@ -2,12 +2,12 @@
 {% block content %}
   <div class='team-title'>
     <img src='{{ team.logos[0] }}' />
-    <a href='/teams/{{ team.key }}'>{{ team.name }}</a>
+    <a href='/{{ team|team_link(league) }}'>{{ team.name }}</a>
   </div>
   <div class='matchups'>
     {% for matchup in team.matchups %}
       <div class='matchup'>
-        {{ matchup.teams.1.name }}
+        <a href='/{{ matchup|matchup_link(league) }}'>{{ matchup.teams.1.name }}</a>
       </div>
     {% endfor %}
   </div>
