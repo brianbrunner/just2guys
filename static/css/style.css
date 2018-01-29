@@ -17,7 +17,7 @@ a, a:visited, a:active, a:hover {
 body {
   font-family: 'Open Sans', sans-serif;
   color: #333;
-  background-color: #f0f0f0; }
+  background-color: #fff; }
 
 .content {
   max-width: 900px;
@@ -28,9 +28,8 @@ table {
   width: 100%;
   border-spacing: 0;
   background-color: #fff; }
-  table thead {
-    background-color: #e63330;
-    color: #fff; }
+  table thead tr th {
+    border-bottom: 4px solid #e63330; }
   table tr td, table tr th {
     box-sizing: border-box;
     text-align: left;
@@ -42,5 +41,13 @@ table {
     height: 60px;
     background-color: #fff;
     border-radius: 50%; }
+
+header {
+  border-bottom: 4px solid #f0f0f0; }
+
+h2 {
+  text-align: center;
+  font-size: 40px;
+  margin: 20px 0 40px; }
 
 /*# sourceMappingURL=style.css.map */

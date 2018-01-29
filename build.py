@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import json
 
@@ -42,8 +44,8 @@ class Builder(object):
     output_name = os.path.abspath(output_name)
     if not os.path.exists(os.path.dirname(output_name)):
       os.makedirs(os.path.dirname(output_name))
-    with open(output_name, 'w') as output_file:
-      output_file.write(html)
+    with open(output_name, 'wb') as output_file:
+      output_file.write(html.encode('utf-8'))
 
   def build(self):
     self.render_index()

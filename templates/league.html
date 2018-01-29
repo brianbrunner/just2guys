@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class='league-header'>
-
-  </div>
+  <header>
+    <div class='title'>
+        {{ league.name }}
+    </div>
+  </header>
   <table class='teams'>
+    <h2>
+      Playoffs
+    </h2>
+    <h2>
+      Regular Season
+    </h2>
     <thead>
       <tr>
         <th></th>
@@ -24,9 +32,9 @@
         <td>
           <a href='/{{ team|team_link(league) }}'>{{ team.name }}</a>
         </td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>{{ team.record.wins }} &ndash; {{ team.record.losses }}</td>
+        <td>{{ team.record.team_points|round(2) }}</td>
+        <td>{{ team.record.points_against|round(2) }}</td>
       </tr>
     {% endfor %}
     </tbody>

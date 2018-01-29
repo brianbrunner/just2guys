@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import json
 
 class Stats(object):
@@ -22,7 +24,9 @@ class Stats(object):
         'wins': 0,
         'losses': 0,
         'team_points': 0,
-        'projected_points': 0
+        'projected_points': 0,
+        'points_against': 0,
+        'projected_points_against': 0
       }
       teams_dict[team['key']] = team
     matchups = league['matchups']
@@ -33,8 +37,12 @@ class Stats(object):
         team_b = teams_dict[matchup['teams'][1]['key']]
         team_a['record']['team_points'] += matchup['teams'][0]['team_points']
         team_a['record']['projected_points'] += matchup['teams'][0]['projected_points']
+        team_a['record']['points_against'] += matchup['teams'][1]['team_points']
+        team_a['record']['projected_points_against'] += matchup['teams'][1]['projected_points']
         team_b['record']['team_points'] += matchup['teams'][1]['team_points']
         team_b['record']['projected_points'] += matchup['teams'][1]['projected_points']
+        team_b['record']['points_against'] += matchup['teams'][0]['team_points']
+        team_b['record']['projected_points_against'] += matchup['teams'][0]['projected_points']
         if matchup['winner_team_key'] == team_a['key']:
           team_a['record']['wins'] += 1
           team_b['record']['losses'] += 1
@@ -62,7 +70,7 @@ class Stats(object):
 
   def write(self, outfile='./leagues.json'):
     with open(outfile, 'w') as f:
-      json.dump(self.leagues, f)
+      json.dump(self.leagues, f, indent=2)
 
 if __name__ == "__main__":
   stats = Stats("./leagues-raw.json")

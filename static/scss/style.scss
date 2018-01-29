@@ -22,7 +22,7 @@ a, a:visited, a:active, a:hover {
 body {
   font-family: 'Open Sans', sans-serif;
   color: #333;
-  background-color: #f0f0f0;
+  background-color: #fff;
 }
 
 .content {
@@ -37,8 +37,11 @@ table {
   background-color: #fff;
 
   thead {
-    background-color: #e63330;
-    color: #fff;
+    tr {
+      th {
+        border-bottom: 4px solid #e63330;
+      }
+    }
   }
 
   tr {
@@ -61,4 +64,18 @@ table {
       border-radius: 50%;
     }
   }
+}
+
+header {
+  border-bottom: 4px solid #f0f0f0;
+
+  .title {
+    
+  }
+}
+
+h2 {
+  text-align: center;
+  font-size: 40px;
+  margin: 20px 0 40px;
 }

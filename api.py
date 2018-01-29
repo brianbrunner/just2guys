@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import json
 import logging
 from xml.etree import ElementTree
@@ -195,7 +197,6 @@ if __name__ == "__main__":
     league_info['matchups'] = api.get_matchups(league['key'])
 
     league_infos.append(league_info)
-    break
 
   with open('leagues-raw.json', 'w') as league_file:
     league_file.write(json.dumps(league_infos, indent=1))
