@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from peewee import *
 
 db = SqliteDatabase('football.db')
@@ -174,6 +176,73 @@ class Matchup(FootballModel):
     team_b = ForeignKeyField(Team)
     team_b_projected_points = FloatField()
     team_b_points = FloatField()
+
+    @classmethod
+    def all_time_manager_records(cls):
+        records = defaultdict(lambda: defaultdict(lambda: {
+            'wins': 0,
+            'losses': 0,
+            'upsets_in_favor': 0,
+            'upsets_against': 0,
+            'largest_margin_of_victory': None,
+            'smallest_margin_of_victory': None,
+            'largest_margin_of_defeat': None,
+            'smallest_margin_of_defeat': None
+        }))
+        for matchup in cls.select():
+            managers_a = matchup.managers_a
+            managers_b = matchup.managers_b
+            for manager_a in managers_a:
+                for manager_b in managers_b:
+                    record_a = records[manager_a.id][manager_b.id]
+                    if 'owner' not in record_a:
+                        record_a['owner'] = manager_a
+                        record_a['opponent'] = manager_b
+                        record_b = records[manager_b.id][manager_a.id]
+                        record_b['owner'] = manager_b
+                        record_b['opponent'] = manager_a
+                    if matchup.team_a_win:
+                        winner_record = records[manager_a.id][manager_b.id]
+                        loser_record = records[manager_b.id][manager_a.id]
+                        print(matchup.team_a_projected_points, matchup.team_b_projected_points)
+                        if matchup.team_a_projected_points < matchup.team_b_projected_points:
+                            winner_record['upsets_in_favor'] += 1
+                            loser_record['upsets_against'] += 1
+                    else:
+                        loser_record = records[manager_a.id][manager_b.id]
+                        winner_record = records[manager_b.id][manager_a.id]
+                        print(matchup.team_b_projected_points, matchup.team_a_projected_points)
+                        if matchup.team_b_projected_points < matchup.team_a_projected_points:
+                            winner_record['upsets_in_favor'] += 1
+                            loser_record['upsets_against'] += 1
+                    winner_record['wins'] += 1
+                    loser_record['losses'] += 1
+                    margin = abs(matchup.team_a_points - matchup.team_b_points)
+                    if winner_record['largest_margin_of_victory'] is None or winner_record['largest_margin_of_victory'] < margin:
+                        winner_record['largest_margin_of_victory'] = margin
+                    if winner_record['smallest_margin_of_victory'] is None or winner_record['smallest_margin_of_victory'] > margin:
+                        winner_record['smallest_margin_of_victory'] = margin
+                    if loser_record['largest_margin_of_defeat'] is None or loser_record['largest_margin_of_defeat'] < margin:
+                        loser_record['largest_margin_of_defeat'] = margin
+                    if loser_record['smallest_margin_of_defeat'] is None or loser_record['smallest_margin_of_defeat'] > margin:
+                        loser_record['smallest_margin_of_defeat'] = margin
+        return records
+
+    @property
+    def team_a_win(self):
+        return self.team_a.key == self.winner_team_key
+
+    @property
+    def team_b_win(self):
+        return not self.team_a_win
+
+    @property
+    def managers_a(self):
+        return self.team_a.managers
+
+    @property
+    def managers_b(self):
+        return self.team_b.managers
 
     @property
     def roster_slots(self):
