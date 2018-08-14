@@ -2,26 +2,14 @@
 
 Because I am bad at Fantasy Football
 
+# Install
+
+  pipenv install
+
 # How To Run
 
-Grab the datas
+Grab the data
 
     ./api.py
 
-Process the data
-
-    ./stats.py
-
-Generate the html
-
-    ./build.py
-
-# Static Assets
-
-Generate the css
-
-    sass static/scss/style.scss static/css/style.css
-
-Or to to watch the sass file
-
-    sass --watch static/scss/style.scss:static/css/style.css
+Mess around with the data using the classes in `models.py`
