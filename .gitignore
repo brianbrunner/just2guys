@@ -101,4 +101,3 @@ ENV/
 .mypy_cache/
 
 .sass-cache
-football.db
