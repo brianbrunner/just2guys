@@ -95,7 +95,7 @@ class API(object):
 
     def get_team_roster(self, team, week, matchup):
         logger.info("Getting roster info for %s for week %s...", team.key, week)
-        tree = self.get_team_resource(team.key, 'players;week=%s/stats;type=week;week=%s' % (week, week))
+        tree = self.get_team_resource(team.key, 'roster;week=%s;/players/stats' % (week))
         return self.process_roster(tree, team, matchup)
 
     def process_roster(self, tree, team, matchup):
@@ -120,7 +120,7 @@ class API(object):
             points = float(tree.find("./yh:player_points", self._ns).find("./yh:total", self._ns).text)
         if (tree.find("./yh:selected_position", self._ns)):
             selected_position = tree.find("./yh:selected_position", self._ns).find("./yh:position", self._ns).text
-        print(selected_position)
+        print(player.name, selected_position, points)
         if matchup and team:
             MatchupRosterSlot.get_or_create(matchup=matchup, team=team, player=player,
                     points=points, position=selected_position, week=matchup.week)
@@ -208,7 +208,6 @@ if __name__ == "__main__":
     league_infos = []
 
     for league in leagues:
-        """
         logger.info("Fetching teams for league %s (%s)...", league.name, league.season)
 
         league_info = {
@@ -227,6 +226,4 @@ if __name__ == "__main__":
             matchups = api.get_team_matchups(team.key, league)
             logger.info("Fetching roster info for team %s in league %s (%s)...", team.name, league.name, league.season)
             rosters = api.get_team_rosters(team, matchups)
-        """
-        api.get_matchups(league)
         break
