@@ -42,7 +42,11 @@ class Team(FootballModel):
     logo = CharField()
     managers = ManyToManyField(Manager, backref='teams')
     roster = ManyToManyField(Player, backref='teams')
-    league = ForeignKeyField(League)
+    league = ForeignKeyField(League, backref='teams')
+
+    @property
+    def matchups(self):
+        return Matchup.select().where((Matchup.team_a==self)|(Matchup.team_b==self))
 
 
 class Matchup(FootballModel):
@@ -58,6 +62,11 @@ class Matchup(FootballModel):
     team_b = ForeignKeyField(Team)
     team_b_projected_points = FloatField()
     team_b_points = FloatField()
+
+    @property
+    def rosters(self):
+        return MatchupRosterSlot.select().where(MatchupRosterSlot.matchup==self)
+
 
 
 class MatchupRosterSlot(FootballModel):

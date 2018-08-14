@@ -106,6 +106,7 @@ class API(object):
     def process_player(self, tree, team=None, matchup=None):
         key = tree.find("./yh:player_key", self._ns).text
         id = tree.find("./yh:player_id", self._ns).text
+        print(tree.find("./yh:name", self._ns).find("./yh:full", self._ns).text)
         player, created = Player.get_or_create(key=key, _id=id, defaults={
             'name': tree.find("./yh:name", self._ns).find("./yh:full", self._ns).text,
             'display_position': tree.find("./yh:display_position", self._ns).text,
@@ -155,7 +156,8 @@ class API(object):
             if add_to_roster:
                 team.roster.add(player)
             if week and selected_position:
-                slot = MatchupRosterSlot.select().where(week==week, MatchupRosterSlot.team==team, MatchupRosterSlot.player==player).get()
+                print(player.name, team.name, week, selected_position)
+                slot = MatchupRosterSlot.select().where(MatchupRosterSlot.week==week, MatchupRosterSlot.team==team, MatchupRosterSlot.player==player).get()
                 slot.position = selected_position
                 slot.save()
 
