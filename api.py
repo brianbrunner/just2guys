@@ -107,7 +107,7 @@ class API(object):
         key = tree.find("./yh:player_key", self._ns).text
         id = tree.find("./yh:player_id", self._ns).text
         print(tree.find("./yh:name", self._ns).find("./yh:full", self._ns).text)
-        player, created = Player.get_or_create(key=key, _id=id, defaults={
+        player, created = Player.get_or_create(_id=id, defaults={
             'name': tree.find("./yh:name", self._ns).find("./yh:full", self._ns).text,
             'display_position': tree.find("./yh:display_position", self._ns).text,
             'position_type': tree.find("./yh:display_position", self._ns).text,
@@ -144,7 +144,7 @@ class API(object):
 
         if created:
             for manager in tree.findall('./yh:managers', self._ns):
-                id = manager.find('.//yh:manager_id', self._ns).text
+                id = manager.find('.//yh:guid', self._ns).text
                 manager, created = Manager.get_or_create(_id=id, defaults={
                     'nickname': manager.find('.//yh:nickname', self._ns).text
                 })
@@ -190,7 +190,7 @@ class API(object):
             'league': league
         })
         return matchup
-            
+
     def get_league_resource(self, league_key, resource):
         return self._make_req('league/%s/%s' % (league_key, resource))
 
@@ -226,4 +226,3 @@ if __name__ == "__main__":
             matchups = api.get_team_matchups(team.key, league)
             logger.info("Fetching roster info for team %s in league %s (%s)...", team.name, league.name, league.season)
             rosters = api.get_team_rosters(team, matchups)
-        break
