@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ team.name }} - Just 2 Guys{% endblock %}
+{% block content %}
+  {% set root_team_id = team.id %}
+  {% include "includes/teamlockup.html" %}
+  {% for matchup in team.matchups %}
+    {% include "includes/matchuplockup.html" %}
+  {% endfor %}
+{% endblock %}

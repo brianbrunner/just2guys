@@ -23,6 +23,9 @@ class League(FootballModel):
     current_week = IntegerField()
     is_finished = BooleanField()
 
+    class Meta:
+        order_by = ['season']
+
     @property
     def regular_season_standings(self):
         standings = [
@@ -95,6 +98,9 @@ class Team(FootballModel):
     managers = ManyToManyField(Manager, backref='teams')
     roster = ManyToManyField(Player, backref='teams')
     league = ForeignKeyField(League, backref='teams')
+
+    class Meta:
+        order_by = ['league.season']
 
     @property
     def made_playoffs(self):
@@ -176,6 +182,9 @@ class Matchup(FootballModel):
     team_b = ForeignKeyField(Team)
     team_b_projected_points = FloatField()
     team_b_points = FloatField()
+
+    class Meta:
+        order_by = ['week']
 
     @classmethod
     def all_time_manager_records(cls):

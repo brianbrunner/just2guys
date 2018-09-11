@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import os
+import time
 
 from jinja2 import Environment, FileSystemLoader
+from watchdog.observers import Observer
 
 from models import *
 
@@ -30,7 +32,45 @@ def render_leagues():
     leagues = League.select()
     for league in leagues:
         _render_template('league.html', 'league/%s/index.html' % league.id, { 'league': league })
+        for team in league.teams.select():
+            render_team(league, team)
+
+def render_team(league, team):
+    _render_template('team.html', 'league/%s/team/%s/index.html' % (league.id, team.id),
+                     { 'team': team })
+
+def render_managers():
+    managers = Manager.select()
+    _render_template('managers.html', 'managers/index.html', { 'managers': managers })
+    for manager in managers:
+        render_manager(manager)
+
+def render_manager(manager):
+    _render_template('manager.html', 'manager/%s/index.html' % manager.id, { 'manager': manager })
+
+class Renderer():
+    def dispatch(self, event):
+        print(event)
+        self.render()
+
+    def render(self):
+        print("Rendering...")
+        render_index()
+        render_leagues()
+        render_managers()
 
 if __name__ == "__main__":
-    render_index()
-    render_leagues()
+    path = './templates'
+    observer = Observer()
+    renderer = Renderer()
+    renderer.render()
+    observer.schedule(renderer, path, recursive=True)
+    observer.start()
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+
+    observer.join()

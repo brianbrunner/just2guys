@@ -1,0 +1,16 @@
+<div class='team-lockup'>
+  <div class='team-info'>
+    <div class='team-logo' style='background-image: url({{ team.logo }})'>
+    </div>
+    <div class='team-name'>
+      <a href='/league/{{ team.league.id }}/team/{{ team.id }}'>{{ team.name }}</a>
+    </div>
+    <div class='team-managers'>
+      {% for manager in team.managers %}
+        <div class='team-manager'>
+          <a href='/manager/{{ manager.id }}'>{{ manager.nickname }}</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

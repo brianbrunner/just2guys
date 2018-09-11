@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Managers - Just 2 Guys{% endblock %}
+{% block content %}
+  {% for manager in managers %}
+    <div class='manager'>
+      <a href='/manager/{{ manager.id }}/'>{{ manager.nickname }}</a>
+    </div>
+  {% endfor %}
+{% endblock %}

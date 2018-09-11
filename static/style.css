@@ -1,0 +1,84 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 20px;
+}
+
+#content {
+  max-width: 1000px;
+  padding: 20px;
+  margin: 0 auto;
+}
+
+.team-info {
+  display: flex;
+  align-items: center;
+}
+
+.team-info .team-logo {
+  width: 30px;
+  height: 30px;
+  background-position: center;
+  background-size: cover;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.team-info .team-name {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.team-info .team-manager {
+  font-size: 14px;
+}
+
+.matchup {
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.matchup .team-a, .matchup .team-b {
+  width: 50%;
+  display: flex;
+}
+
+.matchup .team-name {
+  margin-right: auto;
+  font-size: 18px;
+}
+
+.matchup .team-points {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.matchup .team-projected-points {
+  font-size: 14px;
+  color: #999;
+}
+
+.matchup .team-a {
+  padding-right: 20px;
+}
+
+.matchup .team-b {
+  padding-left: 20px;
+}
+
+.matchup .vs {
+  font-size: 10px;
+  font-weight: bold;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}

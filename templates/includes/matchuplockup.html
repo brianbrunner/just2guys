@@ -1,0 +1,28 @@
+{% if matchup.team_b.id == root_team_id %}
+  {% set team_b = matchup.team_a %}
+  {% set team_b_points = matchup.team_a_points %}
+  {% set team_b_projected_points = matchup.team_a_projected_points %}
+  {% set team_a = matchup.team_b %}
+  {% set team_a_points = matchup.team_b_points %}
+  {% set team_a_projected_points = matchup.team_b_projected_points %}
+{% else %}
+  {% set team_a = matchup.team_a %}
+  {% set team_a_points = matchup.team_a_points %}
+  {% set team_a_projected_points = matchup.team_a_projected_points %}
+  {% set team_b = matchup.team_b %}
+  {% set team_b_points = matchup.team_b_points %}
+  {% set team_b_projected_points = matchup.team_b_projected_points %}
+{% endif %}
+<div class='matchup'>
+  <div class='team-a'>
+    <div class='team-name'>{{ team_a.name }}</div>
+    <div class='team-points'>{{ team_a_points }}</div>
+    <div class='team-projected-points'>({{ team_a_projected_points })}</div>
+  </div>
+  <div class='vs'>VS</div>
+  <div class='team-b'>
+    <div class='team-name'>{{ team_b.name }}</div>
+    <div class='team-points'>{{ team_b_points }}</div>
+    <div class='team-projected-points'>({{ team_b_projected_points }})</div>
+  </div>
+</div>
