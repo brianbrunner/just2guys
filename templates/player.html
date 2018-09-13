@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ player.name }} ({{ player.display_position }}) - Just 2 Guys{% endblock %}
+{% block content %}
+  {% include 'includes/playerlockup.html' %}
+  <div class='player-records'>
+    {% for record in records %}
+      {% include 'includes/recordlockup.html' %}
+    {% endfor %}
+  </div>
+  <div class='player-matchup-slots-by-league'>
+    {% for info in player.matchup_slots_by_league %}
+      <div class='player-matchup-slots-for-league'>
+        {% set league = info.league %}
+        {% include 'includes/leaguelockup.html' %}
+        <div class='matchup-slots'>
+          {% for matchup_slot in info.slots %}
+            {% include 'includes/matchupslotlockup.html' %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

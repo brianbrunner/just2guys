@@ -1,3 +1,34 @@
+.records-list .record {
+  margin: 10px 0;
+}
+.records-list .record .record-name {
+  font-size: 20px;
+}
+.records-list .record .record-description {
+  font-size: 14px;
+  color: #777;
+}
+
+.record .record-info .record-name {
+  font-size: 20px;
+}
+.record .record-info .record-description {
+  font-size: 12px;
+  color: #777;
+}
+.record table.record-entries thead th {
+  background-color: #8888cc;
+  text-align: left;
+  color: #fff;
+  padding: 3px;
+}
+.record table.record-entries tbody tr td {
+  padding: 3px;
+}
+.record table.record-entries tbody tr:nth-child(even) td {
+  background-color: #eee;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -7,6 +38,17 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
   padding: 20px;
+  color: #333;
+}
+
+nav {
+  max-width: 1000px;
+  padding: 20px;
+  margin: 0 auto;
+  display: flex;
+}
+nav a {
+  margin-right: 20px;
 }
 
 #content {
@@ -19,7 +61,6 @@ body {
   display: flex;
   align-items: center;
 }
-
 .team-info .team-logo {
   width: 30px;
   height: 30px;
@@ -27,13 +68,12 @@ body {
   background-size: cover;
   border-radius: 50%;
   margin-right: 10px;
+  background-color: #fff;
 }
-
 .team-info .team-name {
   font-size: 20px;
   margin-right: 10px;
 }
-
 .team-info .team-manager {
   font-size: 14px;
 }
@@ -45,35 +85,28 @@ body {
   width: 100%;
   position: relative;
 }
-
 .matchup .team-a, .matchup .team-b {
   width: 50%;
   display: flex;
 }
-
 .matchup .team-name {
   margin-right: auto;
   font-size: 18px;
 }
-
 .matchup .team-points {
   margin-right: 10px;
   font-size: 18px;
 }
-
 .matchup .team-projected-points {
   font-size: 14px;
   color: #999;
 }
-
 .matchup .team-a {
   padding-right: 20px;
 }
-
 .matchup .team-b {
   padding-left: 20px;
 }
-
 .matchup .vs {
   font-size: 10px;
   font-weight: bold;
@@ -82,3 +115,76 @@ body {
   top: 50%;
   transform: translate(-50%, -50%);
 }
+
+.record table, .record-lockup table {
+  width: 100%;
+}
+
+.rosters {
+  display: flex;
+}
+.rosters .roster {
+  padding: 10px;
+  width: 50%;
+}
+.rosters .roster .matchup-slot-wrapper .week {
+  display: none;
+}
+.rosters .roster:last-child .matchup-slot-wrapper .matchup-slot {
+  flex-direction: row-reverse;
+}
+.rosters .roster:last-child .matchup-slot-wrapper .matchup-slot .selected-position {
+  margin-right: 0;
+  margin-left: 10px;
+  text-align: right;
+}
+.rosters .roster:last-child .matchup-slot-wrapper .matchup-slot .matchup-slot-points-info {
+  margin-left: 0;
+  margin-right: auto;
+}
+.rosters .roster:last-child .matchup-slot-wrapper .matchup-slot .player-lockup .player-info {
+  flex-direction: row-reverse;
+}
+.rosters .roster:last-child .matchup-slot-wrapper .matchup-slot .player-lockup .player-info .player-image {
+  margin-right: 0;
+  margin-left: 4px;
+}
+
+.matchup-slot-wrapper .matchup-slot {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+.matchup-slot-wrapper .matchup-slot .selected-position {
+  margin-right: 10px;
+  font-size: 12px;
+  font-weight: bold;
+  width: 40px;
+}
+.matchup-slot-wrapper .matchup-slot .matchup-slot-points-info {
+  margin-left: auto;
+}
+
+.matchup-slot-wrapper + .matchup-slot-wrapper {
+  border-top: 1px solid #f0f0f0;
+}
+
+.player-lockup .player-info {
+  display: flex;
+  align-items: center;
+}
+.player-lockup .player-info .player-image {
+  background-color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-size: contain;
+  background-position: center;
+  margin-right: 4px;
+  background-repeat: no-repeat;
+}
+.player-lockup .player-info .player-name {
+  font-size: 18px;
+}
+
+/*# sourceMappingURL=style.css.map */

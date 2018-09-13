@@ -1,0 +1,60 @@
+<div class='record-lockup'>
+  <div class='record-info'>
+    <div class='record-name'>
+      <a href='{{ record.link }}'>{{ record.meta.name }}</a>
+    </div>
+    <div class='record-description'>{{ record.meta.description }}</div>
+  </div>
+  <table class='record-entries'>
+    <thead>
+      <th></th>
+      {% for column in record.meta.columns %}
+        <th>{{ column }}</th>
+      {% endfor %}
+    </thead>
+    <tbody>
+      <tr class='entry'>
+        <td class='rank'>{{ record.rank }}</td>
+        {% for column in record.entry %}
+
+          {% if column is number %}
+            <td class='number'>{{ column }}</td>
+          {% endif %}
+
+          {% if column.is_manager %}
+            {% set manager = column %}
+            <td class='manager'>
+              {% include 'includes/managerlockup.html' %}
+            </td>
+          {% endif %}
+
+          {% if column.is_team %}
+            {% set team = column %}
+            <td class='team'>
+              {% include 'includes/teamlockup.html' %}
+            </td>
+          {% endif %}
+
+          {% if column.is_player %}
+            {% set player = column %}
+            <td class='player'>
+              {% include 'includes/playerlockup.html' %}
+            </td>
+          {% endif %}
+
+          {% if column.is_matchup %}
+            {% set matchup = column %}
+            <td class='matchup'>
+              {% include 'includes/matchuplockup.html' %}
+            </td>
+          {% endif %}
+
+          {% if column is string %}
+            <td>{{ column }}</td>
+          {% endif %}
+
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+</div>

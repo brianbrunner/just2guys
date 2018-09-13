@@ -27,6 +27,11 @@ class League(FootballModel):
         order_by = ['season']
 
     @property
+    def is_league(self):
+        # For Jinja Templates
+        return True
+
+    @property
     def regular_season_standings(self):
         standings = [
             {
@@ -45,10 +50,48 @@ class Player(FootballModel):
     position_type = CharField()
     image_url = CharField()
 
+    @property
+    def is_player(self):
+        # For Jinja Templates
+        return True
+
+    @property
+    def matchup_slots_by_league(self):
+        roster_slots = self.matchup_slots.order_by(MatchupRosterSlot.week)
+        slots_by_league = {}
+        for slot in roster_slots:
+            league = slot.matchup.league
+            if league.id not in slots_by_league:
+                slots_by_league[league.id] = {
+                    'league': league,
+                    'slots': [slot]
+                }
+            else:
+                slots_by_league[league.id]['slots'].append(slot)
+        return sorted(slots_by_league.values(), key=lambda s: s['league'].season)
 
 class Manager(FootballModel):
     _id = CharField(unique=True)
     nickname = CharField()
+
+    @property
+    def is_manager(self):
+        # For Jinja Templates
+        return True
+
+    @property
+    def record(self):
+        wins = float(self.wins)
+        losses = float(self.losses)
+        return wins/(wins+losses)
+
+    @property
+    def wins(self):
+        return sum([team.wins for team in self.teams])
+
+    @property
+    def losses(self):
+        return sum([team.losses for team in self.teams])
 
     @property
     def times_made_playoffs(self):
@@ -59,7 +102,7 @@ class Manager(FootballModel):
         stats = [team.regular_season_player_stats for team in self.teams]
         players = stats[0]
         for team_stats in stats[1:]:
-            for player_id, player_stats in team_stats.items(): 
+            for player_id, player_stats in team_stats.items():
                 if player_id not in players:
                     players[player_id] = player_stats
                 else:
@@ -82,6 +125,28 @@ class Manager(FootballModel):
             'teams': projection_errors
         }
 
+    @property
+    def roster_slots(self):
+        return [slot for team in self.teams for slot in team.matchup_slots]
+
+    @property
+    def top_active_players(self):
+        top_players = {}
+        for slot in self.roster_slots:
+            if slot.position == "BN" or slot.position == "IR":
+                continue
+            player = slot.player
+            if player._id not in top_players:
+                top_players[player._id] = {
+                    'player': player,
+                    'count': 1,
+                    'points': slot.points
+                }
+            else:
+                top_players[player._id]['count'] += 1
+                top_players[player._id]['points'] += slot.points
+        return sorted(top_players.values(), key=lambda p: p['count'], reverse=True)
+
     def merge(self, manager):
         for team in manager.teams:
             team.managers.remove(manager)
@@ -101,6 +166,23 @@ class Team(FootballModel):
 
     class Meta:
         order_by = ['league.season']
+
+    @property
+    def is_team(self):
+        # For Jinja Templates
+        return True
+
+    @property
+    def ordered_matchups(self):
+        return self.matchups.order_by(Matchup.week)
+
+    @property
+    def wins(self):
+        return self.matchups.where(Matchup.winner_team_key==self.key).count()
+
+    @property
+    def losses(self):
+        return self.matchups.where(Matchup.winner_team_key!=self.key).count()
 
     @property
     def made_playoffs(self):
@@ -186,6 +268,11 @@ class Matchup(FootballModel):
     class Meta:
         order_by = ['week']
 
+    @property
+    def is_matchup(self):
+        # For Jinja Templates
+        return True
+
     @classmethod
     def all_time_manager_records(cls):
         records = defaultdict(lambda: defaultdict(lambda: {
@@ -238,6 +325,36 @@ class Matchup(FootballModel):
         return records
 
     @property
+    def ordered_matchup_slots_root_a(self):
+        return self.ordered_matchup_slots_by_root_team(root_team=self.team_a)
+
+    @property
+    def ordered_matchup_slots_root_b(self):
+        return self.ordered_matchup_slots_by_root_team(root_team=self.team_b)
+
+    def ordered_matchup_slots_by_root_team(self, root_team=None):
+        if root_team == self.team_b or self.team_b.id == root_team:
+            team_a = self.team_b
+            team_b = self.team_a
+        else:
+            team_a = self.team_a
+            team_b = self.team_b
+        slots = { 'a': [], 'b': [] }
+        for slot in self.matchup_slots:
+            if slot.team == team_a:
+                slots['a'].append(slot)
+            else:
+                slots['b'].append(slot)
+        return [
+            sorted(slots['a'], key=lambda s: MatchupRosterSlot.PRIORITY[s.position]),
+            sorted(slots['b'], key=lambda s: MatchupRosterSlot.PRIORITY[s.position])
+        ]
+
+    @property
+    def margin_of_victory(self):
+        return abs(self.team_a_points - self.team_b_points)
+
+    @property
     def team_a_win(self):
         return self.team_a.key == self.winner_team_key
 
@@ -277,11 +394,31 @@ class Matchup(FootballModel):
 
 class MatchupRosterSlot(FootballModel):
     week = IntegerField()
-    matchup = ForeignKeyField(Matchup)
+    matchup = ForeignKeyField(Matchup, backref='matchup_slots')
     team = ForeignKeyField(Team, backref='matchup_slots')
-    player = ForeignKeyField(Player)
+    player = ForeignKeyField(Player, backref='matchup_slots')
     points = FloatField()
     position = CharField()
+
+    class Meta:
+        order_by = ['week']
+
+    PRIORITY = {
+        'QB': 1,
+        'WR': 2,
+        'RB': 3,
+        'TE': 4,
+        'W/R/T': 5,
+        'DEF': 6,
+        'K': 7,
+        'BN': 8,
+        'IR': 9
+    }
+
+    @property
+    def is_matchup_roster_slot(self):
+        # For Jinja Templates
+        return True
 
 
 db.connect()

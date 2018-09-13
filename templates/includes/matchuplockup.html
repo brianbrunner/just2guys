@@ -13,16 +13,29 @@
   {% set team_b_points = matchup.team_b_points %}
   {% set team_b_projected_points = matchup.team_b_projected_points %}
 {% endif %}
-<div class='matchup'>
-  <div class='team-a'>
-    <div class='team-name'>{{ team_a.name }}</div>
-    <div class='team-points'>{{ team_a_points }}</div>
-    <div class='team-projected-points'>({{ team_a_projected_points })}</div>
+<div class='matchup-wrapper'>
+  <div class='week'>
+    <a href='/league/{{ matchup.league.id }}/matchup/{{ matchup.id }}/'>Week {{ matchup.week }}</a>
   </div>
-  <div class='vs'>VS</div>
-  <div class='team-b'>
-    <div class='team-name'>{{ team_b.name }}</div>
-    <div class='team-points'>{{ team_b_points }}</div>
-    <div class='team-projected-points'>({{ team_b_projected_points }})</div>
+  <div class='matchup {% if hide_root %}hide-root-team{% endif %}'>
+    <div class='team-a'>
+      <div class='team-name'>
+        <a href='/league/{{ matchup.league.id }}/matchups/{{ matchup.id }}/team/{{ team_a.id }}'>
+          {{ team_a.name }}
+        </a>
+      </div>
+      <div class='team-points'>{{ team_a_points }}</div>
+      <div class='team-projected-points'>({{ team_a_projected_points }})</div>
+    </div>
+    <div class='vs'>VS</div>
+    <div class='team-b'>
+      <div class='team-name'>
+        <a href='/league/{{ matchup.league.id }}/matchups/{{ matchup.id }}/team/{{ team_b.id }}'>
+          {{ team_b.name }}
+        </a>
+      </div>
+      <div class='team-points'>{{ team_b_points }}</div>
+      <div class='team-projected-points'>({{ team_b_projected_points }})</div>
+    </div>
   </div>
 </div>

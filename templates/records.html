@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Records - Just 2 Guys{% endblock %}
+{% block content %}
+  <div class='records-list'>
+    {% for record in records %}
+      <div class='record'>
+        <div class='record-name'>
+          <a href='{{ record.link }}'>{{ record.name }}</a>
+        </div>
+        <div class='record-description'>{{ record.description }}</div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

@@ -2,8 +2,6 @@
 {% block title %}Just 2 Guys{% endblock %}
 {% block content %}
   {% for league in leagues %}
-    <div class='league'>
-      <a href='/league/{{ league.id }}'>{{ league.name }}</a>
-    </div>
+    {% include 'includes/leaguelockup.html' %}
   {% endfor %}
 {% endblock %}

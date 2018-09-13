@@ -1,0 +1,46 @@
+.records-list {
+  .record {
+    margin: 10px 0;
+    .record-name {
+      font-size: 20px;
+    }
+    .record-description {
+      font-size: 14px;
+      color: $light-text-color;
+    }
+  }
+}
+
+.record {
+  .record-info {
+    .record-name {
+      font-size: 20px;
+    }
+    .record-description {
+      font-size: 12px;
+      color: $light-text-color;
+    }
+  }
+  table.record-entries {
+    thead {
+      th {
+        background-color: #8888cc;
+        text-align: left;
+        color: #fff;
+        padding: 3px;
+      }
+    }
+    tbody {
+      tr {
+        td {
+          padding: 3px;
+        }
+        &:nth-child(even) {
+          td {
+            background-color: #eee;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ matchup.week }} - Just 2 Guys{% endblock %}
+{% block content %}
+  <div class='matchup-full'>
+    {% include 'includes/matchuplockup.html' %}
+    {% set rosters = matchup.ordered_matchup_slots_root_a %}
+    <div class='rosters'>
+      {% set hide_team = True %}
+      {% for roster in rosters %}
+        <div class='roster'>
+          {% for matchup_slot in roster %}
+            {% include 'includes/matchupslotlockup.html' %}
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

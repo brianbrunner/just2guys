@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ record.name }} - Record - Just 2 Guys{% endblock %}
+{% block content %}
+  <div class='record'>
+    <div class='record-info'>
+      <div class='record-name'>{{ record.name }}</div>
+      <div class='record-description'>{{ record.description }}</div>
+    </div>
+    <table class='record-entries' cellspacing=0 frameBorder=0 cellpadding=0>
+      <thead>
+        <th></th>
+        {% for column in record.columns %}
+          <th>{{ column }}</th>
+        {% endfor %}
+      </thead>
+      <tbody>
+        {% for entry in record.processed_entries %}
+          <tr class='entry'>
+            {% for column in entry %}
+
+              {% if column is number %}
+                <td class='number'>{{ column }}</td>
+              {% endif %}
+
+              {% if column.is_manager %}
+                {% set manager = column %}
+                <td class='manager'>
+                  {% include 'includes/managerlockup.html' %}
+                </td>
+              {% endif %}
+
+              {% if column.is_team %}
+                {% set team = column %}
+                <td class='team'>
+                  {% include 'includes/teamlockup.html' %}
+                </td>
+              {% endif %}
+
+              {% if column.is_player %}
+                {% set player = column %}
+                <td class='player'>
+                  {% include 'includes/playerlockup.html' %}
+                </td>
+              {% endif %}
+
+              {% if column.is_matchup %}
+                {% set matchup = column %}
+                <td class='matchup'>
+                  {% include 'includes/matchuplockup.html' %}
+                </td>
+              {% endif %}
+
+              {% if column.is_league %}
+                {% set league = column %}
+                <td class='league'>
+                  {% include 'includes/leaguelockup.html' %}
+                </td>
+              {% endif %}
+
+              {% if column is string %}
+                <td>{{ column }}</td>
+              {% endif %}
+
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

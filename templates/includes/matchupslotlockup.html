@@ -1,0 +1,22 @@
+<div class='matchup-slot-wrapper'>
+  <div class='week'>Week {{ matchup_slot.week }}</div>
+  <div class='matchup-slot'>
+    <div class='selected-position'>
+      {{ matchup_slot.position }}
+    </div>
+    <div class='matchup-slot-player-info'>
+      {% set player = matchup_slot.player %}
+      {% include 'includes/playerlockup.html' %}
+    </div>
+    {% if not hide_team %}
+      <div class='matchup-slot-team-info'>
+        {% set team = matchup_slot.team %}
+        {% include 'includes/teamlockup.html' %}
+      </div>
+    {% endif %}
+    <div class='matchup-slot-points-info'>
+      <span class='actual'>{{ matchup_slot.points }}</span>
+      <span class='projected'>{{ matchup_slot.projected_points }}</span>
+    </div>
+  </div>
+</div>
