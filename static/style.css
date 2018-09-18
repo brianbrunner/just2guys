@@ -311,4 +311,12 @@ td.matchup {
   font-size: 14px;
 }
 
+.leagues .league {
+  font-size: 20px;
+  padding: 10px 14px;
+}
+.leagues .league:nth-child(even) {
+  background-color: #e8e8e8;
+}
+
 /*# sourceMappingURL=style.css.map */
