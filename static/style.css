@@ -192,7 +192,7 @@ h2 {
   background-color: #8888cc;
   text-align: left;
   color: #fff;
-  padding: 3px;
+  padding: 6px;
 }
 .record table.record-entries tbody tr td, .record-lockup table.record-entries tbody tr td {
   padding: 6px;
@@ -241,6 +241,15 @@ td.matchup {
 }
 .matchup .team-b {
   padding-left: 20px;
+  flex-direction: row-reverse;
+}
+.matchup .team-b .team-name {
+  margin-right: 0;
+  margin-left: auto;
+}
+.matchup .team-b .team-points {
+  margin-left: 10px;
+  margin-right: 0;
 }
 .matchup .vs {
   font-size: 10px;
