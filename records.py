@@ -1,3 +1,5 @@
+from collections import Counter
+
 from memoized_property import memoized_property
 
 from models import *
@@ -108,3 +110,24 @@ class RealDedication(Record):
             round(float(player['points'])/float(player['count']),2)]
             for manager in managers for player in manager.top_active_players if player['count'] >= 10]
         return sorted(entries, key=lambda e: e[3])[0:50]
+
+class Nice(Record):
+
+    def __init__(self):
+        self.name = "Nice"
+        self.description = "Managers With The Most Scores Of 69 Points"
+        self.columns = ["Manager", "Nice"]
+
+    def entries(self):
+        managers = Counter()
+        matchups = Matchup.select().where(((Matchup.team_a_points>=69)&(Matchup.team_a_points<70))| \
+                                          ((Matchup.team_b_points>=69)&(Matchup.team_b_points<70)))
+        for matchup in matchups:
+            if matchup.team_a_points >= 69 or matchup.team_a_points <= 70:
+                for manager in matchup.team_a.managers:
+                    managers[manager.id] += 1
+            if matchup.team_b_points >= 69 or matchup.team_b_points <= 70:
+                for manager in matchup.team_b.managers:
+                    managers[manager.id] += 1
+        entries = [[Manager.get(Manager.id==manager_id), count] for manager_id, count in managers.most_common()]
+        return entries

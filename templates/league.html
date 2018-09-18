@@ -2,8 +2,9 @@
 {% block title %}{{ league.name }} - Just 2 Guys{% endblock %}
 {% block content %}
   <h1>{{ league.name }}</h1>
-  
-  {% for team in league.teams %}
-    {% include 'includes/teamlockup.html' %}
-  {% endfor %}
+  <div class='teams'>
+    {% for team in league.teams %}
+      {% include 'includes/teamlockup.html' %}
+    {% endfor %}
+  </div>
 {% endblock %}
