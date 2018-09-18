@@ -5,7 +5,7 @@
     </div>
     <div class='record-description'>{{ record.meta.description }}</div>
   </div>
-  <table class='record-entries'>
+  <table class='record-entries' cellspacing=0 frameBorder=0 cellpadding=0>
     <thead>
       <th></th>
       {% for column in record.meta.columns %}
@@ -14,7 +14,6 @@
     </thead>
     <tbody>
       <tr class='entry'>
-        <td class='rank'>{{ record.rank }}</td>
         {% for column in record.entry %}
 
           {% if column is number %}

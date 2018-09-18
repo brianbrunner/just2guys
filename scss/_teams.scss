@@ -1,0 +1,38 @@
+.teams {
+  .team-lockup {
+    padding: 10px;
+    &:not(:first-child) {
+      border-top: 1px solid $border-color;
+    }
+  }
+}
+
+.team-lockup {
+  display: flex;
+  align-items: center;
+
+  .team-logo {
+    width: 40px;
+    height: 40px;
+    background-position: center;
+    background-size: cover;
+    border-radius: 50%;
+    margin-right: 10px;
+    background-color: #fff;
+  }
+
+  .team-info {
+    .main-info {
+      display: flex;
+      align-items: center;
+      .team-name {
+        font-size: 20px;
+        margin-right: 10px;
+      }
+
+      .team-manager {
+        font-size: 14px;
+      }
+    }
+  }
+}

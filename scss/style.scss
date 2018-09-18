@@ -2,8 +2,6 @@
 
 @import '_variables.scss';
 
-@import '_records.scss';
-
 * {
   margin: 0;
   padding: 0;
@@ -16,6 +14,25 @@ body {
   color: $text-color;
 }
 
+.main-logo {
+  display: block;
+  max-width: 1000px;
+  padding: 0 20px;
+  margin: 0 auto;
+  font-size: 30px;
+  color: $primary-color;
+  font-family: 'Righteous', cursive;
+}
+
+a {
+  color: $primary-color;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 nav {
   max-width: 1000px;
   padding: 20px;
@@ -23,6 +40,16 @@ nav {
   display: flex;
   a {
     margin-right: 20px;
+    display: inline-block;
+    padding: 10px 12px;
+    border-radius: 4px;
+    background-color: $light-background-color;
+
+    &:hover {
+      background-color: $accent-color;
+      color: #fff;
+      text-decoration: none;
+    }
   }
 }
 
@@ -30,75 +57,6 @@ nav {
   max-width: 1000px;
   padding: 20px;
   margin: 0 auto;
-}
-
-.team-info {
-  display: flex;
-  align-items: center;
-
-  .team-logo {
-    width: 30px;
-    height: 30px;
-    background-position: center;
-    background-size: cover;
-    border-radius: 50%;
-    margin-right: 10px;
-    background-color: #fff;
-  }
-
-  .team-name {
-    font-size: 20px;
-    margin-right: 10px;
-  }
-
-  .team-manager {
-    font-size: 14px;
-  }
-}
-
-.matchup {
-  margin: 10px 0;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  position: relative;
-
-  .team-a, .team-b {
-    width: 50%;
-    display: flex;
-  }
-
-  .team-name {
-    margin-right: auto;
-    font-size: 18px;
-  }
-
-  .team-points {
-    margin-right: 10px;
-    font-size: 18px;
-  }
-
-  .team-projected-points {
-    font-size: 14px;
-    color: #999;
-  }
-
-  .team-a {
-    padding-right: 20px;
-  }
-
-  .team-b {
-    padding-left: 20px;
-  }
-
-  .vs {
-    font-size: 10px;
-    font-weight: bold;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
 }
 
 .record, .record-lockup {
@@ -162,10 +120,26 @@ nav {
     .matchup-slot-points-info {
       margin-left: auto;
     }
+    .matchup-slot-player-info {
+      margin-right: 10px;
+      padding-right: 10px;
+      border-right: 1px solid $border-color;
+    }
+  }
+}
+
+.player-matchup-slots-by-league {
+  margin-top: 30px;
+  .player-matchup-slots-for-league {
+    .league {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
   }
 }
 
 .matchup-slot-wrapper + .matchup-slot-wrapper {
+  padding: 20px 0;
   border-top: 1px solid $border-color;
 }
 
@@ -188,3 +162,20 @@ nav {
     }
   }
 }
+
+h1 {
+  font-size: 36px;
+  margin: 40px 0 30px;
+}
+
+h2 {
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin: 30px 0 20px;
+}
+
+@import '_records.scss';
+@import '_managers.scss';
+@import '_matchups.scss';
+@import '_teams.scss';

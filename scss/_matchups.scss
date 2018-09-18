@@ -1,0 +1,67 @@
+td.matchup {
+  display: table-cell !important;
+}
+
+.matchup {
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+
+  .team-a, .team-b {
+    width: 50%;
+    display: flex;
+  }
+
+  .team-name {
+    margin-right: auto;
+    font-size: 18px;
+  }
+
+  .team-points {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+
+  .team-projected-points {
+    font-size: 14px;
+    color: #999;
+  }
+
+  .team-a {
+    padding-right: 20px;
+  }
+
+  .team-b {
+    padding-left: 20px;
+  }
+
+  .vs {
+    font-size: 10px;
+    font-weight: bold;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.matchup-wrapper {
+  width: 100%;
+  padding: 0 15px;
+  .week {
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+}
+
+.matchups {
+  margin-top: 20px;
+  .matchup {
+    padding: 10px;
+    &:not(:first-child) {
+      border-top: 1px solid $border-color;
+    }
+  }
+}

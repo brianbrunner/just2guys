@@ -1,6 +1,10 @@
-.records-list {
-  .record {
-    margin: 10px 0;
+.record-list {
+  margin-top: 20px;
+  .record-lockup {
+    padding: 20px 0;
+    &:not(:first-child) {
+      border-top: 1px solid $border-color;
+    }
     .record-name {
       font-size: 20px;
     }
@@ -11,7 +15,23 @@
   }
 }
 
-.record {
+.records-list {
+  .record {
+    padding: 10px 0;
+    &:not(:first-child) {
+      border-top: 1px solid $border-color;
+    }
+    .record-name {
+      font-size: 20px;
+    }
+    .record-description {
+      font-size: 14px;
+      color: $light-text-color;
+    }
+  }
+}
+
+.record, .record-lockup {
   .record-info {
     .record-name {
       font-size: 20px;
@@ -33,7 +53,7 @@
     tbody {
       tr {
         td {
-          padding: 3px;
+          padding: 6px;
         }
         &:nth-child(even) {
           td {

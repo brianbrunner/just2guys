@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import time
 import traceback
 from collections import defaultdict
 
 from jinja2 import Environment, FileSystemLoader
-from watchdog.events import FileModifiedEvent
+from watchdog.events import FileModifiedEvent, DirModifiedEvent
 from watchdog.observers import Observer
 
 from models import *
@@ -122,7 +123,7 @@ def render_players():
 
 class Renderer():
     def dispatch(self, event):
-        if isinstance(event, FileModifiedEvent):
+        if isinstance(event, FileModifiedEvent) or isinstance(event, DirModifiedEvent):
             try:
                 self.render()
             except Exception as e:
@@ -141,16 +142,18 @@ class Renderer():
 if __name__ == "__main__":
     load_records()
     path = './templates'
-    observer = Observer()
     renderer = Renderer()
     renderer.render()
-    observer.schedule(renderer, path, recursive=True)
-    observer.start()
 
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
+    if '--watch' in sys.argv:
+        observer = Observer()
+        observer.schedule(renderer, path, recursive=True)
+        observer.start()
 
-    observer.join()
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+
+        observer.join()

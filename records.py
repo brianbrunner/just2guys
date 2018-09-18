@@ -29,7 +29,7 @@ class Demolished(Record):
 
     def entries(self):
         matchups = Matchup.select()
-        entries = [[matchup, matchup.margin_of_victory] for matchup in matchups]
+        entries = [[matchup, round(matchup.margin_of_victory,2)] for matchup in matchups]
         return sorted(entries, key=lambda e: e[1], reverse=True)
 
 class PostseasonAppearances(Record):

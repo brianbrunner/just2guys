@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Managers - Just 2 Guys{% endblock %}
 {% block content %}
-  {% for manager in managers %}
-    <div class='manager'>
-      <a href='/manager/{{ manager.id }}/'>{{ manager.nickname }}</a>
-    </div>
-  {% endfor %}
+  <h1>Managers</h1>
+  <div class='managers'>
+    {% for manager in managers %}
+      <div class='manager'>
+        <a href='/manager/{{ manager.id }}/'>{{ manager.nickname }}</a>
+      </div>
+    {% endfor %}
+  </div>
 {% endblock %}

@@ -3,7 +3,9 @@
 {% block content %}
   {% set root_team_id = team.id %}
   {% include "includes/teamlockup.html" %}
-  {% for matchup in team.ordered_matchups %}
-    {% include "includes/matchuplockup.html" %}
-  {% endfor %}
+  <div class='matchups'>
+    {% for matchup in team.ordered_matchups %}
+      {% include "includes/matchuplockup.html" %}
+    {% endfor %}
+  </div>
 {% endblock %}

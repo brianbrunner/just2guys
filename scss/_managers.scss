@@ -1,0 +1,10 @@
+.managers {
+  .manager {
+    font-size: 20px;
+    padding: 10px 14px;
+
+    &:nth-child(even) {
+      background-color: $light-background-color;
+    }
+  }
+}
