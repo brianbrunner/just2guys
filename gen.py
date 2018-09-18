@@ -24,6 +24,9 @@ RECORDS = [
     Demolished()
 ]
 
+# TODO read the css file and get a hash of it instead of this nonsense
+CACHE_BUSTER = int(time.time())
+
 def load_records():
     print("Loading records...")
     for record in RECORDS:
@@ -53,6 +56,7 @@ def _load_template(name):
         return Environment(loader=FileSystemLoader('./templates')).from_string(f.read())
 
 def _render_template(template_name, output_file, context):
+    context['CACHE_BUSTER'] = CACHE_BUSTER
     output_file_abs = os.path.abspath(output_file)
     output_dir = os.path.dirname(output_file_abs)
     try:

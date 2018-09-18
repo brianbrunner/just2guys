@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Just 2 Guys{% endblock %}
 {% block content %}
-  {% for league in leagues %}
-    {% include 'includes/leaguelockup.html' %}
-  {% endfor %}
+  <div class='leagues'>
+    {% for league in leagues %}
+      {% include 'includes/leaguelockup.html' %}
+    {% endfor %}
+  </div>
 {% endblock %}
