@@ -120,24 +120,6 @@ nav a:hover {
   border-top: 1px solid #f0f0f0;
 }
 
-.player-lockup .player-info {
-  display: flex;
-  align-items: center;
-}
-.player-lockup .player-info .player-image {
-  background-color: #fff;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-size: contain;
-  background-position: center;
-  margin-right: 4px;
-  background-repeat: no-repeat;
-}
-.player-lockup .player-info .player-name {
-  font-size: 18px;
-}
-
 h1 {
   font-size: 36px;
   margin: 40px 0 30px;
@@ -317,6 +299,28 @@ td.matchup {
 }
 .leagues .league:nth-child(even) {
   background-color: #e8e8e8;
+}
+
+.player-records {
+  margin-top: 20px;
+}
+
+.player-lockup .player-info {
+  display: flex;
+  align-items: center;
+}
+.player-lockup .player-info .player-image {
+  background-color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-size: contain;
+  background-position: center;
+  margin-right: 4px;
+  background-repeat: no-repeat;
+}
+.player-lockup .player-info .player-name {
+  font-size: 18px;
 }
 
 /*# sourceMappingURL=style.css.map */

@@ -1,0 +1,23 @@
+.player-records {
+  margin-top: 20px;
+}
+
+.player-lockup {
+  .player-info {
+    display: flex;
+    align-items: center;
+    .player-image {
+      background-color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-size: contain;
+      background-position: center;
+      margin-right: 4px;
+      background-repeat: no-repeat;
+    }
+    .player-name {
+      font-size: 18px;
+    }
+  }
+}

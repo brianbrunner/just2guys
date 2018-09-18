@@ -143,26 +143,6 @@ nav {
   border-top: 1px solid $border-color;
 }
 
-.player-lockup {
-  .player-info {
-    display: flex;
-    align-items: center;
-    .player-image {
-      background-color: #fff;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background-size: contain;
-      background-position: center;
-      margin-right: 4px;
-      background-repeat: no-repeat;
-    }
-    .player-name {
-      font-size: 18px;
-    }
-  }
-}
-
 h1 {
   font-size: 36px;
   margin: 40px 0 30px;
@@ -180,3 +160,4 @@ h2 {
 @import '_matchups.scss';
 @import '_teams.scss';
 @import '_leagues.scss';
+@import '_players.scss';

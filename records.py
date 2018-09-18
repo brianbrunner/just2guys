@@ -20,17 +20,29 @@ class Record():
                 last_rank = rank
         return entries
 
-class Demolished(Record):
+class BadBeats(Record):
 
     def __init__(self):
-        self.name = "Demolished"
-        self.description = "The Matchups With The Highest Margin of Victory"
+        self.name = "Bad Beats"
+        self.description = "The Top 50 Matchups With The Smallest Margin of Victory"
         self.columns = ["Matchup", "Margin of Victory"]
 
     def entries(self):
         matchups = Matchup.select()
         entries = [[matchup, round(matchup.margin_of_victory,2)] for matchup in matchups]
-        return sorted(entries, key=lambda e: e[1], reverse=True)
+        return sorted(entries, key=lambda e: e[1])[:50]
+
+class Demolished(Record):
+
+    def __init__(self):
+        self.name = "Demolished"
+        self.description = "The Top 50 Matchups With The Highest Margin of Victory"
+        self.columns = ["Matchup", "Margin of Victory"]
+
+    def entries(self):
+        matchups = Matchup.select()
+        entries = [[matchup, round(matchup.margin_of_victory,2)] for matchup in matchups]
+        return sorted(entries, key=lambda e: e[1], reverse=True)[:50]
 
 class PostseasonAppearances(Record):
 
@@ -74,20 +86,20 @@ class ManagerFavoritePlayer(Record):
 
     def __init__(self):
         self.name = "Favorite Players"
-        self.description = "The Top 20 Manager/Player Combos That Have Played The Most Games"
+        self.description = "The Top 50 Manager/Player Combos That Have Played The Most Games"
         self.columns = ["Manager","Player","Games Played"]
 
     def entries(self):
         managers = Manager.select()
         entries = [[manager, player['player'], player['count']] for manager in managers
             for player in manager.top_active_players]
-        return sorted(entries, key=lambda e: e[2], reverse=True)[0:20]
+        return sorted(entries, key=lambda e: e[2], reverse=True)[0:50]
 
 class RealDedication(Record):
 
     def __init__(self):
         self.name = "Real Dedication"
-        self.description = "Top 20 Lowest Points Scored Per Game For Manager/Player Combo (10 or More Games)"
+        self.description = "Top 50 Lowest Points Scored Per Game For Manager/Player Combo (10 or More Games)"
         self.columns = ["Manager", "Player", "Games Played", "Avg. Points"]
 
     def entries(self):
@@ -95,4 +107,4 @@ class RealDedication(Record):
         entries = [[manager, player['player'], player['count'],
             round(float(player['points'])/float(player['count']),2)]
             for manager in managers for player in manager.top_active_players if player['count'] >= 10]
-        return sorted(entries, key=lambda e: e[3])[0:20]
+        return sorted(entries, key=lambda e: e[3])[0:50]

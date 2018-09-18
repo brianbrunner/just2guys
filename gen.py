@@ -16,6 +16,7 @@ from records import *
 PLAYER_RECORDS = defaultdict(list)
 MANAGER_RECORDS = defaultdict(list)
 RECORDS = [
+    BadBeats(),
     ManagerMostWins(),
     ManagerBestRecord(),
     ManagerFavoritePlayer(),
