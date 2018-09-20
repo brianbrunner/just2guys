@@ -131,3 +131,41 @@ class Nice(Record):
                     managers[manager.id] += 1
         entries = [[Manager.get(Manager.id==manager_id), count] for manager_id, count in managers.most_common()]
         return entries
+
+class PutMeInCoach(Record):
+
+    def __init__(self):
+        self.name = "Put Me In, Coach"
+        self.description = "Top 50 Most Points Scored By A Non-QB Player On The Bench"
+        self.columns = ["Manager", "Team", "Week", "Player", "Points"]
+
+    def entries(self):
+        roster_slots = MatchupRosterSlot.select(MatchupRosterSlot, Player).join(Player) \
+            .where((MatchupRosterSlot.position=="BN")&(Player.display_position!="QB"))
+        entries = [[manager, slot.team, slot.week, slot.player, slot.points] for slot in roster_slots
+            for manager in slot.team.managers]
+        return sorted(entries, key=lambda e: e[-1], reverse=True)[:50]
+
+class TakeTheHighRoad(Record):
+
+    def __init__(self):
+        self.name = "Take The High Road"
+        self.description = "Top 50 Highest Scoring Games"
+        self.columns = ["Matchup","Total Points"]
+
+    def entries(self):
+        matchups = Matchup.select()
+        entries = [[matchup, matchup.team_a_points+matchup.team_b_points] for matchup in matchups]
+        return sorted(entries, key=lambda e: e[-1], reverse=True)[:50]
+
+class TakeTheLowRoad(Record):
+
+    def __init__(self):
+        self.name = "Take The Low Road"
+        self.description = "Top 50 Lowest Scoring Games"
+        self.columns = ["Matchup","Total Points"]
+
+    def entries(self):
+        matchups = Matchup.select()
+        entries = [[matchup, matchup.team_a_points+matchup.team_b_points] for matchup in matchups]
+        return sorted(entries, key=lambda e: e[-1])[:50]

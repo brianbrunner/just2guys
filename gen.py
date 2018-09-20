@@ -23,7 +23,10 @@ RECORDS = [
     ManagerFavoritePlayer(),
     RealDedication(),
     PostseasonAppearances(),
-    Demolished()
+    Demolished(),
+    PutMeInCoach(),
+    TakeTheLowRoad(),
+    TakeTheHighRoad()
 ]
 
 # TODO read the css file and get a hash of it instead of this nonsense
