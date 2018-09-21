@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ rivalry.owner.nickname }} vs {{ rivalry.opponent.nickname }} - Just 2 Guys{% endblock %}
+{% block content %}
+  {% include 'includes/rivalrylockup.html' %}
+  <h2>Matchups</h2>
+  <div class='matchups'>
+    {% for matchup in rivalry.matchups %}
+      {% include 'includes/matchuplockup.html' %}
+    {% endfor %}
+  </div>
+{% endblock %}

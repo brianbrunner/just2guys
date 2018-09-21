@@ -8,6 +8,12 @@
       {% include 'includes/teamlockup.html' %}
     {% endfor %}
   </div>
+  <h2>Rivalries</h2>
+  <div class='rivalry-list'>
+    {% for rivalry in rivalries %}
+      {% include 'includes/rivalrylockup.html' %}
+    {% endfor %}
+  </div>
   <h2>Records</h2>
   <div class='record-list'>
     {% for record in records %}

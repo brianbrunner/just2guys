@@ -283,7 +283,8 @@ class Matchup(FootballModel):
             'largest_margin_of_victory': None,
             'smallest_margin_of_victory': None,
             'largest_margin_of_defeat': None,
-            'smallest_margin_of_defeat': None
+            'smallest_margin_of_defeat': None,
+            'matchups': []
         }))
         for matchup in cls.select():
             managers_a = matchup.managers_a
@@ -291,23 +292,24 @@ class Matchup(FootballModel):
             for manager_a in managers_a:
                 for manager_b in managers_b:
                     record_a = records[manager_a.id][manager_b.id]
+                    record_b = records[manager_b.id][manager_a.id]
                     if 'owner' not in record_a:
                         record_a['owner'] = manager_a
                         record_a['opponent'] = manager_b
-                        record_b = records[manager_b.id][manager_a.id]
+                    if 'owner' not in record_b:
                         record_b['owner'] = manager_b
                         record_b['opponent'] = manager_a
+                    record_a['matchups'].append(matchup)
+                    record_b['matchups'].append(matchup)
                     if matchup.team_a_win:
                         winner_record = records[manager_a.id][manager_b.id]
                         loser_record = records[manager_b.id][manager_a.id]
-                        print(matchup.team_a_projected_points, matchup.team_b_projected_points)
                         if matchup.team_a_projected_points < matchup.team_b_projected_points:
                             winner_record['upsets_in_favor'] += 1
                             loser_record['upsets_against'] += 1
                     else:
                         loser_record = records[manager_a.id][manager_b.id]
                         winner_record = records[manager_b.id][manager_a.id]
-                        print(matchup.team_b_projected_points, matchup.team_a_projected_points)
                         if matchup.team_b_projected_points < matchup.team_a_projected_points:
                             winner_record['upsets_in_favor'] += 1
                             loser_record['upsets_against'] += 1
@@ -322,6 +324,12 @@ class Matchup(FootballModel):
                         loser_record['largest_margin_of_defeat'] = margin
                     if loser_record['smallest_margin_of_defeat'] is None or loser_record['smallest_margin_of_defeat'] > margin:
                         loser_record['smallest_margin_of_defeat'] = margin
+        for record in records.values():
+            for subrecord in record.values():
+                subrecord['matchups'] = sorted(subrecord['matchups'], key=lambda m: (matchup.league.season, matchup.week))
+                wins = subrecord['wins']
+                losses = subrecord['losses']
+                subrecord['record'] = float(wins)/float(wins+losses)
         return records
 
     @property

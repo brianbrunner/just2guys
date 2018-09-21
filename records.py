@@ -155,7 +155,7 @@ class TakeTheHighRoad(Record):
 
     def entries(self):
         matchups = Matchup.select()
-        entries = [[matchup, matchup.team_a_points+matchup.team_b_points] for matchup in matchups]
+        entries = [[matchup, round(matchup.team_a_points+matchup.team_b_points,2)] for matchup in matchups]
         return sorted(entries, key=lambda e: e[-1], reverse=True)[:50]
 
 class TakeTheLowRoad(Record):
@@ -167,5 +167,19 @@ class TakeTheLowRoad(Record):
 
     def entries(self):
         matchups = Matchup.select()
-        entries = [[matchup, matchup.team_a_points+matchup.team_b_points] for matchup in matchups]
+        entries = [[matchup, round(matchup.team_a_points+matchup.team_b_points,2)] for matchup in matchups]
         return sorted(entries, key=lambda e: e[-1])[:50]
+
+class Domination(Record):
+
+    def __init__(self, rivalries):
+        self.name = "Domination"
+        self.description = "Top 50 Highest Manager vs Manager Records With 3 Or More Games Played"
+        self.columns = ["Top Manager", "Bottom Manager", "Wins", "Losses", "Record"]
+        self.rivalries = rivalries
+
+    def entries(self):
+        entries = [[rivalry['owner'], rivalry['opponent'], rivalry['wins'], rivalry['losses'], round(rivalry['record'],2)]
+            for manager_rivalries in self.rivalries.values() for rivalry in manager_rivalries.values()
+            if rivalry['wins'] + rivalry['losses'] >= 3]
+        return sorted(entries, key=lambda r: r[-1], reverse=True)[0:50]

@@ -323,4 +323,45 @@ td.matchup {
   font-size: 18px;
 }
 
+.rivalry-lockup {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.rivalry-lockup .owner, .rivalry-lockup .opponent, .rivalry-lockup .vs, .rivalry-lockup .details {
+  padding: 10px;
+}
+.rivalry-lockup .details {
+  font-size: 12px;
+  padding-left: 20px;
+}
+.rivalry-lockup .stats {
+  margin-left: auto;
+  display: flex;
+  padding: 10px;
+}
+.rivalry-lockup .stats .win-loss {
+  display: flex;
+  padding: 10px;
+  align-items: center;
+}
+.rivalry-lockup .stats .win-loss .wins, .rivalry-lockup .stats .win-loss .losses {
+  padding: 3px;
+}
+.rivalry-lockup .stats .upsets {
+  padding: 10px;
+}
+.rivalry-lockup .stats .upsets .small-title {
+  font-size: 10px;
+  color: #888;
+}
+.rivalry-lockup .stats .upsets .count {
+  width: 100%;
+  text-align: center;
+}
+
+.rivalry-lockup + .rivalry-lockup {
+  border-top: 1px solid #f0f0f0;
+}
+
 /*# sourceMappingURL=style.css.map */

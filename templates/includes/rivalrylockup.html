@@ -1,0 +1,39 @@
+            <!--'wins': 0,
+            'losses': 0,
+            'upsets_in_favor': 0,
+            'upsets_against': 0,
+            'largest_margin_of_victory': None,
+            'smallest_margin_of_victory': None,
+            'largest_margin_of_defeat': None,
+            'smallest_margin_of_defeat': None-->
+
+<div class='rivalry-lockup'>
+  <div class='owner'>
+    {% set manager = rivalry.owner %}
+    {% include 'includes/managerlockup.html' %}
+  </div>
+  <div class='vs'>VS</div>
+  <div class='opponent'>
+    {% set manager = rivalry.opponent %}
+    {% include 'includes/managerlockup.html' %}
+  </div>
+  <a class='details' href='/rivalry/{{ rivalry.owner.id }}/{{ rivalry.opponent.id }}/'>View Matchups &raquo;</a>
+  <div class='stats'>
+    <div class='upsets'>
+      <div class='small-title'>Upsets In Favor</div>
+      <div class='count'>{{ rivalry.upsets_in_favor }}</div>
+    </div>
+    <div class='upsets'>
+      <div class='small-title'>Upsets Against</div>
+      <div class='count'>{{ rivalry.upsets_against }}</div>
+    </div>
+    <div class='win-loss'>
+      <div class='wins'>{{ rivalry.wins }}</div>
+      &ndash;
+      <div class='losses'>{{ rivalry.losses }}</div>
+    </div>
+  </div>
+  <div class='record'>
+    {{ (rivalry.wins/(rivalry.wins+rivalry.losses))|round(3) }}
+  </div>
+</div>

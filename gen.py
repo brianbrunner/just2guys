@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import hashlib
 import os
 import sys
 import time
@@ -13,6 +14,7 @@ from watchdog.observers import Observer
 from models import *
 from records import *
 
+RIVALRIES = Matchup.all_time_manager_records()
 PLAYER_RECORDS = defaultdict(list)
 MANAGER_RECORDS = defaultdict(list)
 RECORDS = [
@@ -26,11 +28,12 @@ RECORDS = [
     Demolished(),
     PutMeInCoach(),
     TakeTheLowRoad(),
-    TakeTheHighRoad()
+    TakeTheHighRoad(),
+    Domination(RIVALRIES)
 ]
 
-# TODO read the css file and get a hash of it instead of this nonsense
-CACHE_BUSTER = int(time.time())
+with open('./static/style.css','rb') as f:
+    CACHE_BUSTER = hashlib.md5(f.read()).hexdigest()[:10]
 
 def load_records():
     print("Loading records...")
@@ -94,10 +97,12 @@ def render_managers():
         render_manager(manager)
 
 def render_manager(manager):
+    rivalries = RIVALRIES[manager.id].values()
     records = MANAGER_RECORDS[manager.id]
     _render_template('manager.html', 'manager/%s/index.html' % manager.id, {
         'manager': manager,
-        'records': records
+        'records': records,
+        'rivalries': rivalries
     })
 
 def render_records():
@@ -130,6 +135,13 @@ def render_players():
             'records': records
         })
 
+def render_rivalries():
+    for rivalries in RIVALRIES.values():
+        for rivalry in rivalries.values():
+            _render_template('rivalry.html', 'rivalry/%s/%s/index.html' % (rivalry['owner'].id, rivalry['opponent'].id), {
+                'rivalry': rivalry
+            })
+
 class Renderer():
     def dispatch(self, event):
         if isinstance(event, FileModifiedEvent) or isinstance(event, DirModifiedEvent):
@@ -139,14 +151,21 @@ class Renderer():
                 traceback.print_exc()
 
     def render(self):
-        print("Rendering...")
-        render_index()
-        render_leagues()
+        print("Rendering index...")
+        #render_index()
+        print("Rendering leagues...")
+        #render_leagues()
+        print("Rendering managers...")
         render_managers()
-        render_players()
+        print("Rendering players...")
+        #render_players()
+        print("Rendering records...")
         render_records()
-        render_matchups()
-        print("Rendering complete...")
+        print("Rendering rivalries...")
+        render_rivalries()
+        print("Rendering matchups...")
+        #render_matchups()
+        print("Rendering complete")
 
 if __name__ == "__main__":
     load_records()

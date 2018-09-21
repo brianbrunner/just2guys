@@ -1,0 +1,45 @@
+.rivalry-lockup {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  .owner, .opponent, .vs, .details {
+    padding: 10px;
+  }
+
+  .details {
+    font-size: 12px;
+    padding-left: 20px;
+  }
+
+  .stats {
+    margin-left: auto;
+    display: flex;
+    padding: 10px;
+
+    .win-loss {
+      display: flex;
+      padding: 10px;
+      align-items: center;
+      .wins, .losses {
+        padding: 3px;
+      }
+    }
+
+    .upsets {
+      padding: 10px;
+      .small-title {
+        font-size: 10px;
+        color: #888;
+      }
+      .count {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.rivalry-lockup + .rivalry-lockup {
+  border-top: 1px solid $border-color;
+}
