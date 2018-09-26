@@ -21,3 +21,5 @@ Render the templates (automatically watches for changes):
 Render the styles:
 
     sass --watch scss/style.scss:static/style.css
+   
+# TESTING LIVE STUFF
