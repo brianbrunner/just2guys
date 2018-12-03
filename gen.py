@@ -153,19 +153,19 @@ class Renderer():
 
     def render(self):
         print("Rendering index...")
-        #render_index()
+        render_index()
         print("Rendering leagues...")
-        #render_leagues()
+        render_leagues()
         print("Rendering managers...")
         render_managers()
         print("Rendering players...")
-        #render_players()
+        render_players()
         print("Rendering records...")
         render_records()
         print("Rendering rivalries...")
         render_rivalries()
         print("Rendering matchups...")
-        #render_matchups()
+        render_matchups()
         print("Rendering complete")
 
 if __name__ == "__main__":
