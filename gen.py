@@ -20,7 +20,8 @@ RECORDS = [
     ManagerFavoritePlayer(),
     RealDedication(),
     PostseasonAppearances(),
-    Demolished()
+    Demolished(),
+    TeamBestRecord()
 ]
 
 def load_records():

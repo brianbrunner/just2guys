@@ -60,7 +60,7 @@ class ManagerMostWins(Record):
 class ManagerBestRecord(Record):
 
     def __init__(self):
-        self.name = "Best Record"
+        self.name = "Best Manager Record"
         self.description = "Manager With The Best Record"
         self.columns = ["Manager","Record"]
 
@@ -96,3 +96,15 @@ class RealDedication(Record):
             round(float(player['points'])/float(player['count']),2)]
             for manager in managers for player in manager.top_active_players if player['count'] >= 10]
         return sorted(entries, key=lambda e: e[3])[0:20]
+
+class TeamBestRecord(Record):
+
+    def __init__(self):
+        self.name = "Best Regular Season"
+        self.description = "Team With The Most Wins In The Regular Season"
+        self.columns = ["Team","Manager","Wins"]
+
+    def entries(self):
+        teams = Team.select()
+        entries = [[team, team.managers[0], team.regular_season_record['wins']] for team in teams]
+        return sorted(entries, key=lambda e: e[2], reverse=True)

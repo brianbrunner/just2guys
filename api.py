@@ -14,11 +14,12 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 LEAGUE_IDS = {
-    818997,
-    721731,
-    1060011,
-    854870,
-    683479
+    #818997,
+    #721731,
+    #1060011,
+    #854870,
+    #683479,
+    906329
 }
 
 class API(object):
@@ -176,6 +177,10 @@ class API(object):
         ]
         teams = sorted(teams, key=lambda team: team[0].name)
         key = '%s.%s.%s' % (league.key, week, '.'.join(sorted([teams[0][0].key, teams[1][0].key])))
+        try:
+            winner_team_key = tree.find('./yh:winner_team_key', self._ns).text
+        except AttributeError:
+            winner_team_key = ''
         matchup, created = Matchup.get_or_create(key=key, defaults={
             'team_a': teams[0][0],
             'team_a_projected_points': teams[0][1],
@@ -186,7 +191,7 @@ class API(object):
             'week': week,
             'is_playoffs': tree.find('./yh:is_playoffs', self._ns).text == '1',
             'is_consolation': tree.find('./yh:is_consolation', self._ns).text == '1',
-            'winner_team_key': tree.find('./yh:winner_team_key', self._ns).text,
+            'winner_team_key': winner_team_key,
             'league': league
         })
         return matchup
