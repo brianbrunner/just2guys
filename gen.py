@@ -29,7 +29,8 @@ RECORDS = [
     PutMeInCoach(),
     TakeTheLowRoad(),
     TakeTheHighRoad(),
-    Domination(RIVALRIES)
+    Domination(RIVALRIES),
+    TeamBestRecord()
 ]
 
 with open('./static/style.css','rb') as f:

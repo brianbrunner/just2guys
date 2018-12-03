@@ -182,7 +182,7 @@ class Team(FootballModel):
 
     @property
     def losses(self):
-        return self.matchups.where(Matchup.winner_team_key!=self.key).count()
+        return self.matchups.where((Matchup.winner_team_key!='')&(Matchup.winner_team_key!=self.key)).count()
 
     @property
     def made_playoffs(self):
@@ -204,9 +204,10 @@ class Team(FootballModel):
     def regular_season_record(self):
         matchups = self.regular_season_matchups
         wins = len(matchups.where(Matchup.winner_team_key==self.key))
+        losses = len(matchups.where(Matchup.winner_team_key!=self.key&Matchup.winner_team_key!=''))
         return {
             'wins': wins,
-            'losses': len(matchups) - wins
+            'losses': losses
         }
 
     @property
@@ -287,6 +288,8 @@ class Matchup(FootballModel):
             'matchups': []
         }))
         for matchup in cls.select():
+            if matchup.winner_team_key == '':
+                continue
             managers_a = matchup.managers_a
             managers_b = matchup.managers_b
             for manager_a in managers_a:
@@ -368,7 +371,7 @@ class Matchup(FootballModel):
 
     @property
     def team_b_win(self):
-        return not self.team_a_win
+        return self.team_b.key == self.winner_team_key
 
     @property
     def managers_a(self):

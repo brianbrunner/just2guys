@@ -74,7 +74,7 @@ class ManagerMostWins(Record):
 class ManagerBestRecord(Record):
 
     def __init__(self):
-        self.name = "Best Record"
+        self.name = "Best Manager Record"
         self.description = "Manager With The Best Record"
         self.columns = ["Manager","Record"]
 
@@ -183,3 +183,13 @@ class Domination(Record):
             for manager_rivalries in self.rivalries.values() for rivalry in manager_rivalries.values()
             if rivalry['wins'] + rivalry['losses'] >= 3]
         return sorted(entries, key=lambda r: r[-1], reverse=True)[0:50]
+
+class TeamBestRecord(Record):
+     def __init__(self):
+        self.name = "Best Regular Season"
+        self.description = "Team With The Most Wins In The Regular Season"
+        self.columns = ["Team","Manager","Wins"]
+     def entries(self):
+        teams = Team.select()
+        entries = [[team, team.managers[0], team.regular_season_record['wins']] for team in teams]
+        return sorted(entries, key=lambda e: e[2], reverse=True)
