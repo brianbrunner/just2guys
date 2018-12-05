@@ -208,6 +208,9 @@ if __name__ == "__main__":
 
     logger.info("Fetching leagues...")
 
+    for league_id in LEAGUE_IDS:
+        League.delete().where(League.id==league_id)
+
     leagues = api.get_user_leagues()
     leagues = filter(lambda l: int(l._id) in LEAGUE_IDS, leagues)
     league_infos = []
