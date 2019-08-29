@@ -9,6 +9,8 @@ import webbrowser
 
 from models import League, Player, Manager, Team, Matchup, MatchupRosterSlot, Token
 
+AUTH_FILE = './yahoo_creds.json'
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -19,7 +21,9 @@ LEAGUE_IDS = {
     #1060011,
     #854870,
     #683479,
-    906329
+    906329,
+    1117813,
+    1123131,
 }
 
 class API(object):
@@ -40,16 +44,22 @@ class API(object):
             return res.content
 
     def auth(self):
-        webbrowser.open(self._oauth_url)
-        code = input("Enter your connection code:")
-        res = requests.post('https://api.login.yahoo.com/oauth2/get_token', data={
-            'client_id': self._consumer_key,
-            'client_secret': self._consumer_secret,
-            'redirect_uri': 'oob',
-            'code': code,
-            'grant_type': 'authorization_code'
-        })
-        self._oauth_info = res.json()
+        try:
+            with open(AUTH_FILE) as f:
+                self._oauth_info = json.loads(f.read())
+        except FileNotFoundError:
+            webbrowser.open(self._oauth_url)
+            code = input("Enter your connection code:")
+            res = requests.post('https://api.login.yahoo.com/oauth2/get_token', data={
+                'client_id': self._consumer_key,
+                'client_secret': self._consumer_secret,
+                'redirect_uri': 'oob',
+                'code': code,
+                'grant_type': 'authorization_code'
+            })
+            self._oauth_info = res.json()
+            with open(AUTH_FILE, 'w') as f:
+                f.write(json.dumps(self._oauth_info))
 
     def get_user_leagues(self):
         tree = self._make_req('users;use_login=1/games;game_key=nfl/leagues')
