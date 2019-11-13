@@ -23,10 +23,7 @@ LEAGUE_IDS = {
     #683479,
     906329,
     1117813,
-}
-
-JOINT_LEAGUES = {
-    1117813: 1123131,
+    1123131,
 }
 
 class API(object):
@@ -41,6 +38,8 @@ class API(object):
     def _make_req(self, path, method="GET", data={}, headers={}, tree=True):
         headers['Authorization'] = 'Bearer %s' % self._oauth_info['access_token']
         res = requests.request(method, '%s%s' % (self._base_url, path), headers=headers, data=data)
+        if res.content.find(b'token_expired') != -1:
+            raise Exception()
         if tree:
             return ElementTree.fromstring(res.content)
         else:
@@ -50,7 +49,8 @@ class API(object):
         try:
             with open(AUTH_FILE) as f:
                 self._oauth_info = json.loads(f.read())
-        except FileNotFoundError:
+                self.get_user_leagues()
+        except:
             webbrowser.open(self._oauth_url)
             code = input("Enter your connection code:")
             res = requests.post('https://api.login.yahoo.com/oauth2/get_token', data={
@@ -247,3 +247,6 @@ if __name__ == "__main__":
             matchups = api.get_team_matchups(team.key, league)
             logger.info("Fetching roster info for team %s in league %s (%s)...", team.name, league.name, league.season)
             rosters = api.get_team_rosters(team, matchups)
+
+    # cleanup matchups that haven't run yet
+    Matchup.delete().where(Matchup.team_a_points==0,Matchup.team_b_points==0)
