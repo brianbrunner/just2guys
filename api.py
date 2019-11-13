@@ -23,7 +23,10 @@ LEAGUE_IDS = {
     #683479,
     906329,
     1117813,
-    1123131,
+}
+
+JOINT_LEAGUES = {
+    1117813: 1123131,
 }
 
 class API(object):

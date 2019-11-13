@@ -42,6 +42,14 @@ class League(FootballModel):
         ]
         return sorted(standings, key=lambda t: (t['wins'], t['points']), reverse=True)
 
+    def merge_with(league):
+        for team in self.teams:
+            team.league = league
+            team.save()
+        for matchup in self.matchups:
+            matchup.league = league
+            matchup.save()
+
 
 class Player(FootballModel):
     _id = CharField()
@@ -254,7 +262,7 @@ class Team(FootballModel):
 
 class Matchup(FootballModel):
     key = CharField(unique=True)
-    league = ForeignKeyField(League)
+    league = ForeignKeyField(League, backref='matchups')
     week = IntegerField()
     is_playoffs = BooleanField()
     is_consolation = BooleanField()

@@ -14,6 +14,17 @@ from watchdog.observers import Observer
 from models import *
 from records import *
 
+LEAGUE_IDS = {
+    818997,
+    721731,
+    1060011,
+    854870,
+    683479,
+    906329,
+    1117813,
+}
+
+
 RIVALRIES = Matchup.all_time_manager_records()
 PLAYER_RECORDS = defaultdict(list)
 MANAGER_RECORDS = defaultdict(list)
@@ -77,7 +88,7 @@ def _render_template(template_name, output_file, context):
         f.write(template.render(**context).encode('utf-16'))
 
 def render_index():
-    leagues = League.select().order_by(League.season)
+    leagues = League.select().where(League._id << LEAGUE_IDS).order_by(League.season)
     _render_template('leagues.html', 'index.html', { 'leagues': leagues })
 
 def render_leagues():
