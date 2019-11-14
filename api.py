@@ -15,15 +15,25 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-LEAGUE_IDS = {
+USER_LEAGUE_IDS = {
     #818997,
     #721731,
     #1060011,
     #854870,
     #683479,
-    906329,
-    1117813,
-    1123131,
+    #906329,
+    #1117813,
+}
+
+PUBLIC_LEAGUE_KEYS = {
+    '390.l.1123131'
+}
+
+SUB_LEAGUES = {
+    '390.l.1123131': {
+        'name': 'Just 2 Guys Avengers vs Champions',
+        'sub_key': '390.l.1117813',
+    }
 }
 
 class API(object):
@@ -63,6 +73,19 @@ class API(object):
             self._oauth_info = res.json()
             with open(AUTH_FILE, 'w') as f:
                 f.write(json.dumps(self._oauth_info))
+
+    def get_league(self, key):
+        tree = self._make_req('league/%s' % key)
+        league = tree.find(".//yh:league", self._ns)
+        league_data = {
+            'id': int(league.find('./yh:league_id', self._ns).text),
+            'key': league.find('./yh:league_key', self._ns).text,
+            'name': league.find('./yh:name', self._ns).text,
+            'season': league.find('./yh:season', self._ns).text,
+            'current_week': league.find('./yh:current_week', self._ns).text,
+            'is_finished': league.find('./yh:is_finished', self._ns) is not None
+        }
+        return League.get_or_create(_id=league_data['id'], key=league_data['key'], defaults=league_data)[0]
 
     def get_user_leagues(self):
         tree = self._make_req('users;use_login=1/games;game_key=nfl/leagues')
@@ -221,11 +244,15 @@ if __name__ == "__main__":
 
     logger.info("Fetching leagues...")
 
-    for league_id in LEAGUE_IDS:
+    for league_id in USER_LEAGUE_IDS:
         League.delete().where(League.id==league_id)
+    for league_key in PUBLIC_LEAGUE_KEYS:
+        League.delete().where(League.key==league_key)
 
     leagues = api.get_user_leagues()
-    leagues = filter(lambda l: int(l._id) in LEAGUE_IDS, leagues)
+    leagues = list(filter(lambda l: int(l._id) in USER_LEAGUE_IDS, leagues))
+    leagues += [api.get_league(key) for key in PUBLIC_LEAGUE_KEYS]
+    print(leagues[0].key)
     league_infos = []
 
     for league in leagues:
@@ -250,3 +277,9 @@ if __name__ == "__main__":
 
     # cleanup matchups that haven't run yet
     Matchup.delete().where(Matchup.team_a_points==0,Matchup.team_b_points==0)
+
+    for key, info in SUB_LEAGUES.items():
+        parent = League.get(League.key==key)
+        child = League.get(League.key==info['sub_key'])
+        child.merge_into(parent)
+        League.delete().where(League.key==info['sub_key'])

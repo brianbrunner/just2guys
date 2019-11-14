@@ -42,7 +42,7 @@ class League(FootballModel):
         ]
         return sorted(standings, key=lambda t: (t['wins'], t['points']), reverse=True)
 
-    def merge_with(league):
+    def merge_into(self, league):
         for team in self.teams:
             team.league = league
             team.save()
