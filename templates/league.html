@@ -3,7 +3,8 @@
 {% block content %}
   <h1>{{ league.name }}</h1>
   <div class='teams'>
-    {% for team in league.teams %}
+    {% for team_info in league.regular_season_standings %}
+      {% set team = team_info.team %}
       {% include 'includes/teamlockup.html' %}
     {% endfor %}
   </div>

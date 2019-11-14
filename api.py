@@ -21,8 +21,8 @@ USER_LEAGUE_IDS = {
     #1060011,
     #854870,
     #683479,
-    #906329,
-    #1117813,
+    906329,
+    1117813,
 }
 
 PUBLIC_LEAGUE_KEYS = {
@@ -51,7 +51,11 @@ class API(object):
         if res.content.find(b'token_expired') != -1:
             raise Exception()
         if tree:
-            return ElementTree.fromstring(res.content)
+            try:
+                return ElementTree.fromstring(res.content)
+            except Exception as e:
+                print(res.content)
+                raise
         else:
             return res.content
 
@@ -276,10 +280,13 @@ if __name__ == "__main__":
             rosters = api.get_team_rosters(team, matchups)
 
     # cleanup matchups that haven't run yet
-    Matchup.delete().where(Matchup.team_a_points==0,Matchup.team_b_points==0)
+    # This needs to also delete the MatchupRosterSlots
+    # Matchup.delete().where(Matchup.team_a_points==0,Matchup.team_b_points==0).execute()
 
     for key, info in SUB_LEAGUES.items():
         parent = League.get(League.key==key)
         child = League.get(League.key==info['sub_key'])
         child.merge_into(parent)
-        League.delete().where(League.key==info['sub_key'])
+        parent.name = info['name']
+        parent.save()
+        League.delete().where(League.key==info['sub_key']).execute()

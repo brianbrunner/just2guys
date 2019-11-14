@@ -40,7 +40,7 @@ class League(FootballModel):
                 'team': team
             } for team in self.teams
         ]
-        return sorted(standings, key=lambda t: (t['wins'], t['points']), reverse=True)
+        return sorted(standings, key=lambda t: t['wins'], reverse=True)
 
     def merge_into(self, league):
         for team in self.teams:
@@ -49,6 +49,9 @@ class League(FootballModel):
         for matchup in self.matchups:
             matchup.league = league
             matchup.save()
+
+    def ranked_teams(self):
+        return sorted(list(self.teams), key=lambda t: t.wins)
 
 
 class Player(FootballModel):
@@ -183,6 +186,14 @@ class Team(FootballModel):
     @property
     def ordered_matchups(self):
         return self.matchups.order_by(Matchup.week)
+
+    @property
+    def points_for(self):
+        return sum([mathcup.info_for_team(self)['projected_points'] for matchup in self.matchups])
+
+    @property
+    def points_against(self):
+        return self.matchups.where(Matchup.winner_team_key==self.key).count()
 
     @property
     def wins(self):
@@ -393,7 +404,7 @@ class Matchup(FootballModel):
     def roster_slots(self):
         return MatchupRosterSlot.select().where(MatchupRosterSlot.matchup==self)
 
-    def info_for_team(self, team):
+    def info_for_team(self, team, opponent=False):
         if team == self.team_a:
             return {
                 "projected_points": self.team_a_projected_points,
