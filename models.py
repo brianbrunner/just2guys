@@ -189,11 +189,11 @@ class Team(FootballModel):
 
     @property
     def points_for(self):
-        return sum([mathcup.info_for_team(self)['projected_points'] for matchup in self.matchups])
+        return sum([matchup.info_for_team(self)['projected_points'] for matchup in self.matchups])
 
     @property
     def points_against(self):
-        return self.matchups.where(Matchup.winner_team_key==self.key).count()
+        return sum([matchup.info_for_opponent(self)['projected_points'] for matchup in self.matchups])
 
     @property
     def wins(self):
@@ -404,7 +404,15 @@ class Matchup(FootballModel):
     def roster_slots(self):
         return MatchupRosterSlot.select().where(MatchupRosterSlot.matchup==self)
 
-    def info_for_team(self, team, opponent=False):
+    def info_for_opponent(self, team):
+        if team == self.team_a:
+            return self.info_for_team(self.team_b)
+        elif team == self.team_b:
+            return self.info_for_team(self.team_a)
+        else:
+            raise Exception("That team is not part of this matchup")
+
+    def info_for_team(self, team):
         if team == self.team_a:
             return {
                 "projected_points": self.team_a_projected_points,
