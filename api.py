@@ -220,7 +220,7 @@ class API(object):
         try:
             winner_team_key = tree.find('./yh:winner_team_key', self._ns).text
         except AttributeError:
-            winner_team_key = ''
+            winner_team_key = None
         matchup, created = Matchup.get_or_create(key=key, defaults={
             'team_a': teams[0][0],
             'team_a_projected_points': teams[0][1],

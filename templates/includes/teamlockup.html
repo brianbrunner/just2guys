@@ -15,7 +15,7 @@
     </div>
     <div class='detail-info'>
       <div class='record'>
-        {{ team.wins }}&ndash;{{ team.losses }} | PF: {{ team.points_for }} | PA: {{ team.points_against }}
+        {{ team.wins }}&ndash;{{ team.losses }} | PF: {{ team.points_for|round(2) }} | PA: {{ team.points_against|round(2) }}
       </div>
     </div>
   </div>

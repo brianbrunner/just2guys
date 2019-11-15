@@ -20,7 +20,11 @@
   <div class='matchup {% if hide_root %}hide-root-team{% endif %}'>
     <div class='team-a'>
       <div class='team-name'>
-        <a href='/league/{{ matchup.league.id }}/matchups/{{ matchup.id }}/team/{{ team_a.id }}'>
+	{% if team_link %}
+          <a href='/league/{{ matchup.league.id }}/team/{{ team_a.id }}'>
+        {% else %}
+          <a href='/league/{{ matchup.league.id }}/matchup/{{ matchup.id }}'>
+        {% endif %}
           {{ team_a.name }}
         </a>
       </div>
@@ -30,7 +34,11 @@
     <div class='vs'>VS</div>
     <div class='team-b'>
       <div class='team-name'>
-        <a href='/league/{{ matchup.league.id }}/matchups/{{ matchup.id }}/team/{{ team_b.id }}'>
+	{% if team_link %}
+          <a href='/league/{{ matchup.league.id }}/team/{{ team_b.id }}'>
+        {% else %}
+          <a href='/league/{{ matchup.league.id }}/matchup/{{ matchup.id }}'>
+        {% endif %}
           {{ team_b.name }}
         </a>
       </div>

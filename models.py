@@ -32,15 +32,62 @@ class League(FootballModel):
         return True
 
     @property
+    def final_standings(self):
+        regular_season_standings = self.regular_season_standings
+        final_standings = regular_season_standings[8:]
+
+        winners = regular_season_standings[:8]
+
+        # Run quarter finals
+        quarter_finals = self.matchups.where(Matchup.week==14, Matchup.team_a<<winners)
+        if not quarter_finals.exists():
+            return regular_season_standings
+        losers = []
+        for matchup in quarter_finals:
+            loser = matchup.loser
+            loser_record = [record for record in winners if record['team'].key == loser.key][0]
+            loser_record
+            losers.append(loser_record)
+            winners = [record for record in winners if record['team'].key != loser.key]
+        final_standings = self.sort_standings(losers) + final_standings
+
+        # Run semi finals
+        semi_finals = self.matchups.where(Matchup.week==15, Matchup.team_a<<winners)
+        if not semi_finals.exists():
+            return self.sort_standings(winners) + final_standings
+        losers = []
+        for matchup in semi_finals:
+            loser = matchup.loser
+            loser_record = [record for record in winners if record['team'].key == loser.key][0]
+            loser_record
+            losers.append(loser_record)
+            winners = [record for record in winners if record['team'].key != loser.key]
+        final_standings = self.sort_standings(losers) + final_standings
+
+        # Run finals
+        finals = self.matchups.where(Matchup.week==16, Matchup.team_a<<winners)
+        if not finals.exists():
+            return self.sort_standings(winners) + final_standings
+        losers = []
+        for matchup in semi_finals:
+            loser = matchup.loser
+            loser_record = [record for record in winners if record['team'].key == loser.key][0]
+            loser_record
+            losers.append(loser_record)
+            winners = [record for record in winners if record['team'].key != loser.key]
+        return winners + self.sort_standings(losers) + final_standings
+
+    @property
     def regular_season_standings(self):
         standings = [
             {
                 'wins': team.regular_season_record['wins'],
-                'points': team.regular_season_points,
+                'points_for': team.regular_season_points,
+                'points_against': team.regular_season_points_against,
                 'team': team
             } for team in self.teams
         ]
-        return sorted(standings, key=lambda t: t['wins'], reverse=True)
+        return self.sort_standings(standings)
 
     def merge_into(self, league):
         for team in self.teams:
@@ -49,6 +96,9 @@ class League(FootballModel):
         for matchup in self.matchups:
             matchup.league = league
             matchup.save()
+
+    def sort_standings(self, standings):
+        return sorted(standings, key=lambda t: (t['wins'], t['team'].points_for, -t['team'].points_against), reverse=True) 
 
     def ranked_teams(self):
         return sorted(list(self.teams), key=lambda t: t.wins)
@@ -231,7 +281,7 @@ class Team(FootballModel):
 
     @property
     def regular_season_matchups_with_infos(self):
-        return [(matchup, matchup.info_for_team(self)) for matchup in self.regular_season_matchups]
+        return [(matchup, matchup.info_for_team(self), matchup.info_for_opponent(self)) for matchup in self.regular_season_matchups]
 
     @property
     def regular_season_projected_points(self):
@@ -240,6 +290,10 @@ class Team(FootballModel):
     @property
     def regular_season_points(self):
         return sum([entry[1]['points'] for entry in self.regular_season_matchups_with_infos])
+
+    @property
+    def regular_season_points_against(self):
+        return sum([entry[2]['points'] for entry in self.regular_season_matchups_with_infos])
 
     @property
     def regular_season_projection_error(self):
@@ -277,7 +331,7 @@ class Matchup(FootballModel):
     week = IntegerField()
     is_playoffs = BooleanField()
     is_consolation = BooleanField()
-    winner_team_key = CharField()
+    winner_team_key = CharField(null=True)
     team_a = ForeignKeyField(Team)
     team_a_projected_points = FloatField()
     team_a_points = FloatField()
@@ -391,6 +445,14 @@ class Matchup(FootballModel):
     @property
     def team_b_win(self):
         return self.team_b.key == self.winner_team_key
+
+    @property
+    def loser(self):
+        return self.team_b if self.winner_team_key == self.team_b.key else team_a
+
+    @property
+    def loser(self):
+        return self.team_a if self.winner_team_key == self.team_b.key else team_b
 
     @property
     def managers_a(self):

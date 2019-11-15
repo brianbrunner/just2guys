@@ -2,6 +2,7 @@
 {% block title %}{{ matchup.week }} - Just 2 Guys{% endblock %}
 {% block content %}
   <div class='matchup-full'>
+    {% set team_link = True %}
     {% include 'includes/matchuplockup.html' %}
     {% set rosters = matchup.ordered_matchup_slots_root_a %}
     <div class='rosters'>
