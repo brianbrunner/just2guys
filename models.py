@@ -10,6 +10,17 @@ class FootballModel(Model):
     class Meta:
         database = db
 
+    @classmethod
+    def update_or_create(cls, **kwargs):
+        obj, created = cls.get_or_create(**kwargs)
+        if not created:
+            defaults = kwargs.get('defaults', None)
+            if defaults is not None:
+                for key, value in defaults.items():
+                    setattr(obj, key, value)
+                obj.save()
+        return obj, created
+
 
 class Token(FootballModel):
     token = CharField()
@@ -32,50 +43,15 @@ class League(FootballModel):
         return True
 
     @property
-    def final_standings(self):
-        regular_season_standings = self.regular_season_standings
-        final_standings = regular_season_standings[8:]
+    def is_multi_league(self):
+        any([team.group == "B" for team in self.teams])
 
-        winners = regular_season_standings[:8]
+    @property
+    def build_playoffs(self, last_week=16, num_playoffs=8, group="A"):
+        if current_week < 14:
+            return
 
-        # Run quarter finals
-        quarter_finals = self.matchups.where(Matchup.week==14, Matchup.team_a<<winners)
-        if not quarter_finals.exists():
-            return regular_season_standings
-        losers = []
-        for matchup in quarter_finals:
-            loser = matchup.loser
-            loser_record = [record for record in winners if record['team'].key == loser.key][0]
-            loser_record
-            losers.append(loser_record)
-            winners = [record for record in winners if record['team'].key != loser.key]
-        final_standings = self.sort_standings(losers) + final_standings
-
-        # Run semi finals
-        semi_finals = self.matchups.where(Matchup.week==15, Matchup.team_a<<winners)
-        if not semi_finals.exists():
-            return self.sort_standings(winners) + final_standings
-        losers = []
-        for matchup in semi_finals:
-            loser = matchup.loser
-            loser_record = [record for record in winners if record['team'].key == loser.key][0]
-            loser_record
-            losers.append(loser_record)
-            winners = [record for record in winners if record['team'].key != loser.key]
-        final_standings = self.sort_standings(losers) + final_standings
-
-        # Run finals
-        finals = self.matchups.where(Matchup.week==16, Matchup.team_a<<winners)
-        if not finals.exists():
-            return self.sort_standings(winners) + final_standings
-        losers = []
-        for matchup in semi_finals:
-            loser = matchup.loser
-            loser_record = [record for record in winners if record['team'].key == loser.key][0]
-            loser_record
-            losers.append(loser_record)
-            winners = [record for record in winners if record['team'].key != loser.key]
-        return winners + self.sort_standings(losers) + final_standings
+        week_14_matchups = self.matchups.where(Matchup.week==14)
 
     @property
     def regular_season_standings(self):
@@ -91,6 +67,7 @@ class League(FootballModel):
 
     def merge_into(self, league):
         for team in self.teams:
+            team.group = "B"
             team.league = league
             team.save()
         for matchup in self.matchups:
@@ -98,7 +75,7 @@ class League(FootballModel):
             matchup.save()
 
     def sort_standings(self, standings):
-        return sorted(standings, key=lambda t: (t['wins'], t['team'].points_for, -t['team'].points_against), reverse=True) 
+        return sorted(standings, key=lambda t: (t['team'].group, t['wins'], t['team'].points_for, -t['team'].points_against), reverse=True) 
 
     def ranked_teams(self):
         return sorted(list(self.teams), key=lambda t: t.wins)
@@ -224,6 +201,7 @@ class Team(FootballModel):
     managers = ManyToManyField(Manager, backref='teams')
     roster = ManyToManyField(Player, backref='teams')
     league = ForeignKeyField(League, backref='teams')
+    group = CharField(default="A")
 
     class Meta:
         order_by = ['league.season']
@@ -331,13 +309,14 @@ class Matchup(FootballModel):
     week = IntegerField()
     is_playoffs = BooleanField()
     is_consolation = BooleanField()
+    bracket_order = IntegerField(null=True)
     winner_team_key = CharField(null=True)
     team_a = ForeignKeyField(Team)
     team_a_projected_points = FloatField()
     team_a_points = FloatField()
-    team_b = ForeignKeyField(Team)
-    team_b_projected_points = FloatField()
-    team_b_points = FloatField()
+    team_b = ForeignKeyField(Team, null=True)
+    team_b_projected_points = FloatField(null=True)
+    team_b_points = FloatField(null=True)
 
     class Meta:
         order_by = ['week']
@@ -465,6 +444,32 @@ class Matchup(FootballModel):
     @property
     def roster_slots(self):
         return MatchupRosterSlot.select().where(MatchupRosterSlot.matchup==self)
+
+    def merge_into(self, matchup):
+        team_infos = [
+            {
+                'team': self.team_a,
+                'projected_points': self.team_a_projected_points,
+                'points': self.team_a_points,
+            },
+            {
+                'team': matchup.team_a,
+                'projected_points': matchup.team_a_projected_points,
+                'points': matchup.team_a_points,
+            }
+        ]
+        sorted_team_infos = sorted(team_infos, key=lambda info: info['team'].name)
+        team_a = sorted_team_infos[0]
+        team_b = sorted_team_infos[1]
+        key = '%s.%s.%s.%s' % (league.key, week, team_a['team'].key, team_b['team'].key)
+        self.team_a = team_a['team']
+        self.team_a_projected_points = team_a['team']['projected_points']
+        self.team_a_points = team_a['team']['points']
+        self.team_b = team_b['team']
+        self.team_b_projected_points = team_b['team']['projected_points']
+        self.team_b_points = team_b['team']['points']
+        matchup.delete_instance()
+
 
     def info_for_opponent(self, team):
         if team == self.team_a:

@@ -21,18 +21,24 @@ USER_LEAGUE_IDS = {
     #1060011,
     #854870,
     #683479,
-    906329,
-    1117813,
+    #906329,
+    #1117813,
+    1079660,
 }
 
 PUBLIC_LEAGUE_KEYS = {
-    '390.l.1123131'
+    #'390.l.1123131',
+    '399.l.1026513',
 }
 
 SUB_LEAGUES = {
-    '390.l.1123131': {
-        'name': 'Just 2 Guys Avengers vs Champions',
-        'sub_key': '390.l.1117813',
+    #'390.l.1123131': {
+    #    'name': 'Just 2 Guys Avengers vs Champions',
+    #    'sub_key': '390.l.1117813',
+    #},
+    '399.l.1026513': {
+        'name': 'Just 2 Guys La Liga vs Bundesliga',
+        'sub_key': '399.l.1079660',
     }
 }
 
@@ -63,7 +69,9 @@ class API(object):
         try:
             with open(AUTH_FILE) as f:
                 self._oauth_info = json.loads(f.read())
-                self.get_user_leagues()
+                leagues = self.get_user_leagues()
+                if len(leagues) == 0:
+                    raise Exception("No leagues")
         except:
             webbrowser.open(self._oauth_url)
             code = input("Enter your connection code:")
@@ -86,10 +94,10 @@ class API(object):
             'key': league.find('./yh:league_key', self._ns).text,
             'name': league.find('./yh:name', self._ns).text,
             'season': league.find('./yh:season', self._ns).text,
-            'current_week': league.find('./yh:current_week', self._ns).text,
+            'current_week': int(league.find('./yh:current_week', self._ns).text),
             'is_finished': league.find('./yh:is_finished', self._ns) is not None
         }
-        return League.get_or_create(_id=league_data['id'], key=league_data['key'], defaults=league_data)[0]
+        return League.update_or_create(_id=league_data['id'], key=league_data['key'], defaults=league_data)[0]
 
     def get_user_leagues(self):
         tree = self._make_req('users;use_login=1/games;game_key=nfl/leagues')
@@ -99,11 +107,11 @@ class API(object):
                 'key': league.find('./yh:league_key', self._ns).text,
                 'name': league.find('./yh:name', self._ns).text,
                 'season': league.find('./yh:season', self._ns).text,
-                'current_week': league.find('./yh:current_week', self._ns).text,
+                'current_week': int(league.find('./yh:current_week', self._ns).text),
                 'is_finished': league.find('./yh:is_finished', self._ns) is not None
             } for league in tree.findall(".//yh:league", self._ns)
         ]
-        return [League.get_or_create(_id=league['id'], key=league['key'], defaults=league)[0] for league in league_data]
+        return [League.update_or_create(_id=league['id'], key=league['key'], defaults=league)[0] for league in league_data]
 
     def get_league_teams(self, league):
         tree = self.get_league_resource(league.key, 'teams')
@@ -113,7 +121,7 @@ class API(object):
 
     def get_matchups(self, league):
         return [
-            self.get_matchup(league, i) for i in range(1,17)
+            self.get_matchup(league, i) for i in range(1,17) if i <= league.current_week
         ]
 
     def get_matchup(self, league, week):
@@ -125,8 +133,9 @@ class API(object):
 
     def get_team_matchups(self, team_key, league):
             tree = self.get_team_resource(team_key, 'matchups')
+            # We only pull the first 13 matchups so we can do post season stuff on our own
             return [
-                self.process_matchup(matchup, league) for matchup in tree.findall(".//yh:matchup", self._ns)
+                self.process_matchup(matchup, league) for matchup in tree.findall(".//yh:matchup", self._ns)[:13]
             ]
 
     def get_team_rosters(self, team, matchups):
@@ -134,7 +143,7 @@ class API(object):
             self.get_team_roster(team, i+1, matchups[i]) for i in range(0,len(matchups))
         ]
 
-    def get_team_roster(self, team, week, matchup):
+    def get_team_roster(self, team, week, matchup=None):
         logger.info("Getting roster info for %s for week %s...", team.key, week)
         tree = self.get_team_resource(team.key, 'roster;week=%s;/players/stats' % (week))
         return self.process_roster(tree, team, matchup)
@@ -148,7 +157,7 @@ class API(object):
         key = tree.find("./yh:player_key", self._ns).text
         id = tree.find("./yh:player_id", self._ns).text
         print(tree.find("./yh:name", self._ns).find("./yh:full", self._ns).text)
-        player, created = Player.get_or_create(_id=id, defaults={
+        player, created = Player.update_or_create(_id=id, defaults={
             'name': tree.find("./yh:name", self._ns).find("./yh:full", self._ns).text,
             'display_position': tree.find("./yh:display_position", self._ns).text,
             'position_type': tree.find("./yh:display_position", self._ns).text,
@@ -163,7 +172,7 @@ class API(object):
             selected_position = tree.find("./yh:selected_position", self._ns).find("./yh:position", self._ns).text
         print(player.name, selected_position, points)
         if matchup and team:
-            MatchupRosterSlot.get_or_create(matchup=matchup, team=team, player=player,
+            MatchupRosterSlot.update_or_create(matchup=matchup, team=team, player=player,
                     points=points, position=selected_position, week=matchup.week)
         return player, points, selected_position
 
@@ -177,7 +186,7 @@ class API(object):
     def process_team(self, tree, league, add_to_roster=True, week=None):
         id    = tree.find('./yh:team_id', self._ns).text
         key = tree.find('./yh:team_key', self._ns).text
-        team, created = Team.get_or_create(_id=id, key=key, defaults={
+        team, created = Team.update_or_create(_id=id, key=key, defaults={
             'name': tree.find('./yh:name', self._ns).text,
             'logo': [logo.text for logo in tree.find('./yh:team_logos', self._ns).findall('.//yh:url', self._ns)][0],
             'league': league
@@ -186,7 +195,7 @@ class API(object):
         if created:
             for manager in tree.findall('./yh:managers', self._ns):
                 id = manager.find('.//yh:guid', self._ns).text
-                manager, created = Manager.get_or_create(_id=id, defaults={
+                manager, created = Manager.update_or_create(_id=id, defaults={
                     'nickname': manager.find('.//yh:nickname', self._ns).text
                 })
                 team.managers.add(manager)
@@ -221,7 +230,7 @@ class API(object):
             winner_team_key = tree.find('./yh:winner_team_key', self._ns).text
         except AttributeError:
             winner_team_key = None
-        matchup, created = Matchup.get_or_create(key=key, defaults={
+        matchup, created = Matchup.update_or_create(key=key, defaults={
             'team_a': teams[0][0],
             'team_a_projected_points': teams[0][1],
             'team_a_points': teams[0][2],
@@ -256,7 +265,6 @@ if __name__ == "__main__":
     leagues = api.get_user_leagues()
     leagues = list(filter(lambda l: int(l._id) in USER_LEAGUE_IDS, leagues))
     leagues += [api.get_league(key) for key in PUBLIC_LEAGUE_KEYS]
-    print(leagues[0].key)
     league_infos = []
 
     for league in leagues:
@@ -278,6 +286,10 @@ if __name__ == "__main__":
             matchups = api.get_team_matchups(team.key, league)
             logger.info("Fetching roster info for team %s in league %s (%s)...", team.name, league.name, league.season)
             rosters = api.get_team_rosters(team, matchups)
+            num_matchups = len(matchups)
+            while num_matchups < 16 and num_matchups <= league.current_week:
+                num_matchups += 1
+                api.get_team_roster(team, num_matchups)
 
     # cleanup matchups that haven't run yet
     # This needs to also delete the MatchupRosterSlots
@@ -290,3 +302,5 @@ if __name__ == "__main__":
         parent.name = info['name']
         parent.save()
         League.delete().where(League.key==info['sub_key']).execute()
+
+    # TODO run playoffs
