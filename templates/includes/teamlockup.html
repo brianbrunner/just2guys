@@ -1,4 +1,7 @@
 <div class='team-lockup'>
+  {% if show_group %}
+    <div class='team-group group-{{ team.group }}'></div>
+  {% endif %}
   <div class='team-logo' style='background-image: url({{ team.logo }})'></div>
   <div class='team-info'>
     <div class='main-info'>
@@ -15,7 +18,9 @@
     </div>
     <div class='detail-info'>
       <div class='record'>
-        {{ team.wins }}&ndash;{{ team.losses }} | PF: {{ team.points_for|round(2) }} | PA: {{ team.points_against|round(2) }}
+        {{ team.regular_season_wins }}&ndash;{{ team.regular_season_losses }} |
+        PF: {{ team.points_for|round(2) }} |
+        PA: {{ team.points_against|round(2) }}
       </div>
     </div>
   </div>

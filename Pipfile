@@ -9,6 +9,8 @@ requests = "==2.18.4"
 "Jinja2" = "==2.10"
 watchdog = "*"
 memoized-property = "*"
+ipython = "*"
+pdb = "*"
 
 [dev-packages]
 ipython = "*"

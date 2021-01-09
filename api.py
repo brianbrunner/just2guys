@@ -2,6 +2,7 @@
 
 import json
 import logging
+import pdb
 from xml.etree import ElementTree
 
 import requests
@@ -15,6 +16,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+MANAGER_SOURCE_LEAGUES = {
+    361737,
+    500538,
+}
+
 USER_LEAGUE_IDS = {
     #818997,
     #721731,
@@ -23,12 +29,12 @@ USER_LEAGUE_IDS = {
     #683479,
     #906329,
     #1117813,
-    1079660,
+    #1079660,
 }
 
 PUBLIC_LEAGUE_KEYS = {
     #'390.l.1123131',
-    '399.l.1026513',
+    #'399.l.1026513',
 }
 
 SUB_LEAGUES = {
@@ -36,10 +42,10 @@ SUB_LEAGUES = {
     #    'name': 'Just 2 Guys Avengers vs Champions',
     #    'sub_key': '390.l.1117813',
     #},
-    '399.l.1026513': {
-        'name': 'Just 2 Guys La Liga vs Bundesliga',
-        'sub_key': '399.l.1079660',
-    }
+    #'399.l.1026513': {
+    #    'name': 'Just 2 Guys La Liga vs Bundesliga',
+    #    'sub_key': '399.l.1079660',
+    #}
 }
 
 class API(object):
@@ -113,10 +119,10 @@ class API(object):
         ]
         return [League.update_or_create(_id=league['id'], key=league['key'], defaults=league)[0] for league in league_data]
 
-    def get_league_teams(self, league):
+    def get_league_teams(self, league, manager_only=False):
         tree = self.get_league_resource(league.key, 'teams')
         return [
-            self.process_team(team, league)[0] for team in tree.findall(".//yh:team", self._ns)
+            self.process_team(team, league, manager_only=manager_only)[0] for team in tree.findall(".//yh:team", self._ns)
         ]
 
     def get_matchups(self, league):
@@ -143,7 +149,24 @@ class API(object):
             self.get_team_roster(team, i+1, matchups[i]) for i in range(0,len(matchups))
         ]
 
-    def get_team_roster(self, team, week, matchup=None):
+    def get_team_roster(self, team, week, matchup=None, league=None, is_postseason=False):
+        if is_postseason:
+            matchup = league.matchups.where((Matchup.week==week)&((Matchup.team_a==team.id)|(Matchup.team_b==team.id)))
+            if matchup.exists():
+                print("Using existing for postseason")
+                matchup = matchup[0]
+            else:
+                print("Creating new for postseason")
+                key = "%s.%s.%s.unmatched" % (league.key, week, team.key)
+                matchup = Matchup.create(
+                    key=key,
+                    team_a=team,
+                    team_a_points=0,
+                    week=week,
+                    league=league,
+                    is_playoffs=False,
+                    is_consolation=False,
+                )
         logger.info("Getting roster info for %s for week %s...", team.key, week)
         tree = self.get_team_resource(team.key, 'roster;week=%s;/players/stats' % (week))
         return self.process_roster(tree, team, matchup)
@@ -183,7 +206,15 @@ class API(object):
         ]
         return matchups
 
-    def process_team(self, tree, league, add_to_roster=True, week=None):
+    def process_team(self, tree, league, add_to_roster=True, week=None, manager_only=False):
+        if manager_only:
+            for manager in tree.findall('./yh:managers', self._ns):
+                id = manager.find('.//yh:guid', self._ns).text
+                manager, created = Manager.update_or_create(_id=id, defaults={
+                    'nickname': manager.find('.//yh:nickname', self._ns).text
+                })
+            return None, None
+
         id    = tree.find('./yh:team_id', self._ns).text
         key = tree.find('./yh:team_key', self._ns).text
         team, created = Team.update_or_create(_id=id, key=key, defaults={
@@ -195,12 +226,11 @@ class API(object):
         if created:
             for manager in tree.findall('./yh:managers', self._ns):
                 id = manager.find('.//yh:guid', self._ns).text
-                manager, created = Manager.update_or_create(_id=id, defaults={
+                manager, created = Manager.get_or_create(_id=id, defaults={
                     'nickname': manager.find('.//yh:nickname', self._ns).text
                 })
                 team.managers.add(manager)
 
-        print(tree.findall(".//yh:player", self._ns))
         for player in tree.findall(".//yh:player", self._ns):
             player, points, selected_position = self.process_player(player)
             if add_to_roster:
@@ -289,7 +319,7 @@ if __name__ == "__main__":
             num_matchups = len(matchups)
             while num_matchups < 16 and num_matchups <= league.current_week:
                 num_matchups += 1
-                api.get_team_roster(team, num_matchups)
+                api.get_team_roster(team, num_matchups, is_postseason=True, league=league)
 
     # cleanup matchups that haven't run yet
     # This needs to also delete the MatchupRosterSlots
@@ -303,4 +333,8 @@ if __name__ == "__main__":
         parent.save()
         League.delete().where(League.key==info['sub_key']).execute()
 
-    # TODO run playoffs
+    # This is done last to get rid of "--hidden--" manager names
+    for league_id in MANAGER_SOURCE_LEAGUES:
+        league = League.select().where(League.id==league_id)[0]
+        teams = api.get_league_teams(league, manager_only=True)
+        league.delete_instance()

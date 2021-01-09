@@ -1,11 +1,107 @@
 {% extends "base.html" %}
 {% block title %}{{ league.name }} - Just 2 Guys{% endblock %}
 {% block content %}
+<div class='league-main'>
   <h1>{{ league.name }}</h1>
+  {% if league.current_week >= 14 %}
+    <div class='postseason'>
+      <div class='bracket winners'>
+        <div class='bracket-title'>
+          Winners Bracket
+        </div>
+        {% if league.current_week >= 16 %}
+          <div class='round'>
+            <div class='title'>
+              Finals
+            </div>
+            <div class='matchups'>
+              {% for matchup in league.finals_winners %}
+                {% include "includes/matchuplockup.html" %}
+              {% endfor %}
+            </div>
+          </div>
+          <div class='round'>
+            <div class='title'>
+              Consolation
+            </div>
+            <div class='matchups'>
+              {% for matchup in league.consolation %}
+                {% include "includes/matchuplockup.html" %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+        {% if league.current_week >= 15 %}
+          <div class='round'>
+            <div class='title'>
+              Semifinals
+            </div>
+            <div class='matchups'>
+              {% for matchup in league.semifinals_winners %}
+                {% include "includes/matchuplockup.html" %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+        <div class='round'>
+          <div class='title'>
+            Quarterfinals
+          </div>
+          <div class='matchups'>
+            {% for matchup in league.quarterfinals_winners %}
+              {% include "includes/matchuplockup.html" %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class='bracket losers'>
+        <div class='bracket-title'>
+          Losers Bracket
+        </div>
+        {% if league.current_week >= 16 %}
+          <div class='round'>
+            <div class='title'>
+              Finals
+            </div>
+            <div class='matchups'>
+              {% for matchup in league.finals_losers %}
+                {% include "includes/matchuplockup.html" %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+        {% if league.current_week >= 15 %}
+          <div class='round'>
+            <div class='title'>
+              Semifinals
+            </div>
+            <div class='matchups'>
+              {% for matchup in league.semifinals_losers %}
+                {% include "includes/matchuplockup.html" %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+        <div class='round'>
+          <div class='title'>
+            Quarterfinals
+          </div>
+          <div class='matchups'>
+            {% for matchup in league.quarterfinals_losers %}
+              {% include "includes/matchuplockup.html" %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
   <div class='teams'>
     {% for team_info in league.regular_season_standings %}
+      {% set show_group = league.is_multi_league %}
       {% set team = team_info.team %}
       {% include 'includes/teamlockup.html' %}
     {% endfor %}
   </div>
+</div>
 {% endblock %}

@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 
 from memoized_property import memoized_property
 
@@ -30,7 +30,7 @@ class BadBeats(Record):
         self.columns = ["Matchup", "Margin of Victory"]
 
     def entries(self):
-        matchups = Matchup.select()
+        matchups = Matchup.select().where(Matchup.winner_team_key.is_null(False))
         entries = [[matchup, round(matchup.margin_of_victory,2)] for matchup in matchups]
         return sorted(entries, key=lambda e: e[1])[:50]
 
@@ -42,7 +42,7 @@ class Demolished(Record):
         self.columns = ["Matchup", "Margin of Victory"]
 
     def entries(self):
-        matchups = Matchup.select()
+        matchups = Matchup.select().where(Matchup.winner_team_key.is_null(False))
         entries = [[matchup, round(matchup.margin_of_victory,2)] for matchup in matchups]
         return sorted(entries, key=lambda e: e[1], reverse=True)[:50]
 
@@ -120,8 +120,9 @@ class Nice(Record):
 
     def entries(self):
         managers = Counter()
-        matchups = Matchup.select().where(((Matchup.team_a_points>=69)&(Matchup.team_a_points<70))| \
-                                          ((Matchup.team_b_points>=69)&(Matchup.team_b_points<70)))
+        matchups = Matchup.select().where(Matchup.winner_team_key.is_null(False)& \
+                                          (((Matchup.team_a_points>=69)&(Matchup.team_a_points<70))| \
+                                          ((Matchup.team_b_points>=69)&(Matchup.team_b_points<70))))
         for matchup in matchups:
             if matchup.team_a_points >= 69 or matchup.team_a_points <= 70:
                 for manager in matchup.team_a.managers:
@@ -154,7 +155,7 @@ class TakeTheHighRoad(Record):
         self.columns = ["Matchup","Total Points"]
 
     def entries(self):
-        matchups = Matchup.select()
+        matchups = Matchup.select().where(Matchup.winner_team_key.is_null(False))
         entries = [[matchup, round(matchup.team_a_points+matchup.team_b_points,2)] for matchup in matchups]
         return sorted(entries, key=lambda e: e[-1], reverse=True)[:50]
 
@@ -166,7 +167,7 @@ class TakeTheLowRoad(Record):
         self.columns = ["Matchup","Total Points"]
 
     def entries(self):
-        matchups = Matchup.select()
+        matchups = Matchup.select().where(Matchup.winner_team_key.is_null(False))
         entries = [[matchup, round(matchup.team_a_points+matchup.team_b_points,2)] for matchup in matchups]
         return sorted(entries, key=lambda e: e[-1])[:50]
 
@@ -192,4 +193,48 @@ class TeamBestRecord(Record):
      def entries(self):
         teams = Team.select()
         entries = [[team, team.managers[0], team.regular_season_record['wins']] for team in teams]
+        return sorted(entries, key=lambda e: e[2], reverse=True)
+
+class LeagueWinners(Record):
+    def __init__(self):
+        self.name = "Los Campeones"
+        self.description = "Managers With One Or More League Championships"
+        self.columns = ["Manager","Sesons","Total"]
+    def entries(self):
+        matchups = Matchup.select().where((Matchup.winner_team_key.is_null(False))&(Matchup.week==16)&(Matchup.is_playoffs==True))
+        champions = defaultdict(lambda: {
+            'manager': None,
+            'seasons': [],
+            'total': 0
+        })
+        for matchup in matchups:
+            season = matchup.league.season
+            for manager in matchup.winner.managers:
+                entry = champions[manager.id]
+                entry['manager'] = manager
+                entry['seasons'].append(str(season))
+                entry['total'] += 1
+        entries = [[c['manager'], ', '.join(c['seasons']), c['total']] for c in champions.values()]
+        return sorted(entries, key=lambda e: e[2], reverse=True)
+
+class LeagueLosers(Record):
+    def __init__(self):
+        self.name = "Soy Un Perdedor"
+        self.description = "Managers With One Or More League Losses"
+        self.columns = ["Manager","Sesons","Total"]
+    def entries(self):
+        matchups = Matchup.select().where((Matchup.winner_team_key.is_null(False))&(Matchup.week==16)&(Matchup.is_losers==True))
+        champions = defaultdict(lambda: {
+            'manager': None,
+            'seasons': [],
+            'total': 0
+        })
+        for matchup in matchups:
+            season = matchup.league.season
+            for manager in matchup.loser.managers:
+                entry = champions[manager.id]
+                entry['manager'] = manager
+                entry['seasons'].append(str(season))
+                entry['total'] += 1
+        entries = [[c['manager'], ', '.join(c['seasons']), c['total']] for c in champions.values()]
         return sorted(entries, key=lambda e: e[2], reverse=True)

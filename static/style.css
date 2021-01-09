@@ -202,13 +202,22 @@ td.matchup {
   width: 100%;
   position: relative;
 }
+.matchup .trophy {
+  font-size: 20px;
+  padding: 0 5px;
+}
 .matchup .team-a, .matchup .team-b {
   width: 50%;
   display: flex;
 }
-.matchup .team-name {
+.matchup .team-info {
   margin-right: auto;
+}
+.matchup .team-info .team-name {
   font-size: 18px;
+}
+.matchup .team-info .manager-name {
+  font-size: 14px;
 }
 .matchup .team-points {
   margin-right: 10px;
@@ -225,9 +234,12 @@ td.matchup {
   padding-left: 20px;
   flex-direction: row-reverse;
 }
-.matchup .team-b .team-name {
+.matchup .team-b .team-info {
   margin-right: 0;
   margin-left: auto;
+}
+.matchup .team-b .manager-name {
+  text-align: right;
 }
 .matchup .team-b .team-points {
   margin-left: 10px;
@@ -272,6 +284,18 @@ td.matchup {
   display: flex;
   align-items: center;
 }
+.team-lockup .team-group {
+  width: 10px;
+  height: 50px;
+  margin-right: 10px;
+  margin-left: -10px;
+}
+.team-lockup .team-group.group-A {
+  background-color: rgba(255, 100, 0, 0.75);
+}
+.team-lockup .team-group.group-B {
+  background-color: rgba(25, 25, 250, 0.75);
+}
 .team-lockup .team-logo {
   width: 40px;
   height: 40px;
@@ -291,6 +315,39 @@ td.matchup {
 }
 .team-lockup .team-info .main-info .team-manager {
   font-size: 14px;
+}
+
+.league-main h1 {
+  font-size: 48px;
+  text-align: center;
+  color: #fff;
+  background-color: #144676;
+  text-transform: uppercase;
+  padding: 10px;
+  margin-bottom: 30px;
+  font-weight: bold;
+}
+.league-main .bracket {
+  margin-bottom: 20px;
+}
+.league-main .bracket .bracket-title {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 24px;
+  padding: 10px;
+  margin: 10px 0;
+  color: #fff;
+}
+.league-main .bracket .round .title {
+  text-transform: uppercase;
+  padding: 5px;
+  font-weight: bold;
+}
+.league-main .bracket.winners .bracket-title {
+  background-color: rgba(0, 220, 0, 0.75);
+}
+.league-main .bracket.losers .bracket-title {
+  background-color: rgba(255, 0, 0, 0.75);
 }
 
 .leagues .league {

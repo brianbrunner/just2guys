@@ -11,6 +11,21 @@
   display: flex;
   align-items: center;
 
+  .team-group {
+    width: 10px;
+    height: 50px;
+    margin-right: 10px;
+    margin-left: -10px;
+
+    &.group-A {
+      background-color: rgba(255,100,0,0.75);
+    }
+
+    &.group-B {
+      background-color: rgba(25,25,250,0.75);
+    }
+  }
+
   .team-logo {
     width: 40px;
     height: 40px;

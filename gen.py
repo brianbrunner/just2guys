@@ -22,6 +22,7 @@ LEAGUE_IDS = {
     683479,
     906329,
     1123131,
+    1026513
 }
 
 
@@ -29,6 +30,8 @@ RIVALRIES = Matchup.all_time_manager_records()
 PLAYER_RECORDS = defaultdict(list)
 MANAGER_RECORDS = defaultdict(list)
 RECORDS = [
+    LeagueWinners(),
+    LeagueLosers(),
     Nice(),
     BadBeats(),
     ManagerMostWins(),
@@ -87,6 +90,13 @@ def _render_template(template_name, output_file, context):
     with open(output_file_abs, 'wb') as f:
         f.write(template.render(**context).encode('utf-16'))
 
+def finalize_leagues():
+    Manager.cleanup()
+    leagues = League.select().where(League._id << LEAGUE_IDS).order_by(League.season)
+    for league in leagues:
+        league.reset_playoffs()
+        league.build_playoffs()
+
 def render_index():
     leagues = League.select().where(League._id << LEAGUE_IDS).order_by(League.season)
     _render_template('leagues.html', 'index.html', { 'leagues': leagues })
@@ -131,7 +141,7 @@ def render_records():
     _render_template('records.html', 'records/index.html', { 'records': records })
 
 def render_matchups():
-    for matchup in Matchup.select():
+    for matchup in Matchup.select().where(Matchup.team_b.is_null(False)):
         _render_template('matchup.html', 'league/%s/matchup/%s/index.html' % (
             matchup.league.id,
             matchup.id
@@ -180,6 +190,7 @@ class Renderer():
         print("Rendering complete")
 
 if __name__ == "__main__":
+    finalize_leagues()
     load_records()
     path = './templates'
     renderer = Renderer()

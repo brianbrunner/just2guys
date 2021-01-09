@@ -19,31 +19,67 @@
   </div>
   <div class='matchup {% if hide_root %}hide-root-team{% endif %}'>
     <div class='team-a'>
-      <div class='team-name'>
-	{% if team_link %}
-          <a href='/league/{{ matchup.league.id }}/team/{{ team_a.id }}'>
-        {% else %}
-          <a href='/league/{{ matchup.league.id }}/matchup/{{ matchup.id }}'>
+      {% if matchup.winner_team_key == team_b.key and matchup.is_losers %}
+        <div class='trophy'>☠️</div>
+      {% else %}
+        {% if matchup.winner_team_key == team_a.key %}
+          <div class='trophy'>🏆</div>
         {% endif %}
-          {{ team_a.name }}
-        </a>
+      {% endif %}
+      <div class='team-info'>
+        <div class='team-name'>
+          {% if team_link %}
+            <a href='/league/{{ matchup.league.id }}/team/{{ team_a.id }}'>
+          {% else %}
+            <a href='/league/{{ matchup.league.id }}/matchup/{{ matchup.id }}'>
+          {% endif %}
+            {{ team_a.name }}
+          </a>
+        </div>
+        <div class='manager-name'>
+          {% for manager in team_a.managers %}
+            <a href='/manager/{{ manager.id }}'>
+              {{ manager.nickname }}
+            </a>
+          {% endfor %}
+        </div>
       </div>
-      <div class='team-points'>{{ team_a_points }}</div>
-      <div class='team-projected-points'>({{ team_a_projected_points }})</div>
+      <div class='team-points'>{{ team_a_points|round(2) }}</div>
+      {% if team_a_projected_points %}
+        <div class='team-projected-points'>({{ team_a_projected_points|round(2) }})</div>
+      {% endif %}
     </div>
     <div class='vs'>VS</div>
     <div class='team-b'>
-      <div class='team-name'>
-	{% if team_link %}
-          <a href='/league/{{ matchup.league.id }}/team/{{ team_b.id }}'>
-        {% else %}
-          <a href='/league/{{ matchup.league.id }}/matchup/{{ matchup.id }}'>
+      {% if matchup.winner_team_key == team_a.key and matchup.is_losers %}
+        <div class='trophy'>☠️</div>
+      {% else %}
+        {% if matchup.winner_team_key == team_b.key %}
+          <div class='trophy'>🏆</div>
         {% endif %}
-          {{ team_b.name }}
-        </a>
+      {% endif %}
+      <div class='team-info'>
+        <div class='team-name'>
+          {% if team_link %}
+            <a href='/league/{{ matchup.league.id }}/team/{{ team_b.id }}'>
+          {% else %}
+            <a href='/league/{{ matchup.league.id }}/matchup/{{ matchup.id }}'>
+          {% endif %}
+            {{ team_b.name }}
+          </a>
+        </div>
+        <div class='manager-name'>
+          {% for manager in team_b.managers %}
+            <a href='/manager/{{ manager.id }}'>
+              {{ manager.nickname }}
+            </a>
+          {% endfor %}
+        </div>
       </div>
-      <div class='team-points'>{{ team_b_points }}</div>
-      <div class='team-projected-points'>({{ team_b_projected_points }})</div>
+      <div class='team-points'>{{ team_b_points|round(2) }}</div>
+      {% if team_b_projected_points %}
+        <div class='team-projected-points'>({{ team_b_projected_points|round(2) }})</div>
+      {% endif %}
     </div>
   </div>
 </div>
