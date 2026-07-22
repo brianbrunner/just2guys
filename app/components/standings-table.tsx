@@ -1,6 +1,12 @@
 import { Link } from "react-router";
 
-interface StandingRow {
+import {
+  SortableHeader,
+  type SortColumns,
+  useSortableRows,
+} from "./sortable-table";
+
+export interface StandingRow {
   rank: number;
   teamId: string;
   teamName: string;
@@ -13,6 +19,40 @@ interface StandingRow {
   pointsAgainst: number;
 }
 
+type StandingSortKey =
+  "rank" | "club" | "wins" | "losses" | "ties" | "pointsFor" | "pointsAgainst";
+
+const standingSortColumns: SortColumns<StandingRow, StandingSortKey> = {
+  rank: {
+    compare: (left, right) => left.rank - right.rank,
+    initialDirection: "ascending",
+  },
+  club: {
+    compare: (left, right) => left.teamName.localeCompare(right.teamName),
+    initialDirection: "ascending",
+  },
+  wins: {
+    compare: (left, right) => left.wins - right.wins,
+    initialDirection: "descending",
+  },
+  losses: {
+    compare: (left, right) => left.losses - right.losses,
+    initialDirection: "descending",
+  },
+  ties: {
+    compare: (left, right) => left.ties - right.ties,
+    initialDirection: "descending",
+  },
+  pointsFor: {
+    compare: (left, right) => left.pointsFor - right.pointsFor,
+    initialDirection: "descending",
+  },
+  pointsAgainst: {
+    compare: (left, right) => left.pointsAgainst - right.pointsAgainst,
+    initialDirection: "descending",
+  },
+};
+
 export function StandingsTable({
   rows,
   year,
@@ -20,6 +60,10 @@ export function StandingsTable({
   rows: StandingRow[];
   year: number;
 }) {
+  const { sortedRows, sort, requestSort } = useSortableRows<
+    StandingRow,
+    StandingSortKey
+  >(rows, standingSortColumns, { key: "rank", direction: "ascending" });
   if (!rows.length)
     return (
       <div className="empty-state">
@@ -31,17 +75,53 @@ export function StandingsTable({
       <table className="standings-table">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Club</th>
-            <th scope="col">W</th>
-            <th scope="col">L</th>
-            <th scope="col">T</th>
-            <th scope="col">PF</th>
-            <th scope="col">PA</th>
+            <SortableHeader
+              column="rank"
+              label="#"
+              sort={sort}
+              onSort={requestSort}
+            />
+            <SortableHeader
+              column="club"
+              label="Club"
+              sort={sort}
+              onSort={requestSort}
+              align="left"
+            />
+            <SortableHeader
+              column="wins"
+              label="W"
+              sort={sort}
+              onSort={requestSort}
+            />
+            <SortableHeader
+              column="losses"
+              label="L"
+              sort={sort}
+              onSort={requestSort}
+            />
+            <SortableHeader
+              column="ties"
+              label="T"
+              sort={sort}
+              onSort={requestSort}
+            />
+            <SortableHeader
+              column="pointsFor"
+              label="PF"
+              sort={sort}
+              onSort={requestSort}
+            />
+            <SortableHeader
+              column="pointsAgainst"
+              label="PA"
+              sort={sort}
+              onSort={requestSort}
+            />
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
+          {sortedRows.map((row) => (
             <tr key={row.teamId}>
               <td className="rank-cell">{row.rank}</td>
               <th scope="row">

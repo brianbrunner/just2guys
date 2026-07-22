@@ -182,9 +182,6 @@ input {
   }
 }
 
-.hero {
-  padding-block: clamp(50px, 9vw, 116px) clamp(44px, 7vw, 84px);
-}
 .page-header {
   display: flex;
   align-items: flex-start;
@@ -219,33 +216,6 @@ input {
   flex: none;
   padding-top: 10px;
 }
-.hero-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  margin-top: clamp(36px, 6vw, 70px);
-  border-block: 1px solid var(--line);
-}
-.hero-stats div {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  padding: 20px 0;
-}
-.hero-stats div + div {
-  padding-left: 28px;
-  border-left: 1px solid var(--line);
-}
-.hero-stats strong {
-  font: 800 clamp(1.7rem, 3vw, 2.6rem) var(--serif);
-}
-.hero-stats span {
-  color: var(--muted);
-  font-size: 0.76rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
 .section {
   padding-block: clamp(44px, 7vw, 86px);
 }
@@ -256,6 +226,7 @@ input {
   gap: 24px;
   margin-bottom: 28px;
 }
+.section-heading h1,
 .section-heading h2,
 .section h2 {
   margin: 0;
@@ -434,6 +405,41 @@ thead th {
   font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+.sortable-header {
+  padding: 0;
+}
+.sortable-header button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  padding: 12px 10px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+.sortable-header-left button {
+  justify-content: flex-start;
+}
+.sortable-header button:hover {
+  color: var(--orange-dark);
+}
+.sort-indicator {
+  min-width: 0.75rem;
+  color: var(--orange-dark);
+  font-size: 0.78rem;
+  line-height: 1;
+}
+.section-dark .sortable-header button:hover,
+.section-dark .sort-indicator {
+  color: var(--acid);
 }
 th:nth-child(2),
 td:nth-child(2),
@@ -1265,14 +1271,6 @@ tbody th small {
   .page-header-aside {
     margin-top: 18px;
   }
-  .hero-stats {
-    grid-template-columns: 1fr;
-  }
-  .hero-stats div + div {
-    padding-left: 0;
-    border-left: 0;
-    border-top: 1px solid var(--line);
-  }
   .score-grid,
   .archive-grid,
   .lineup-grid,
@@ -1338,9 +1336,6 @@ tbody th small {
   }
   .site-header nav a:nth-child(4) {
     display: none;
-  }
-  .hero {
-    padding-top: 44px;
   }
   .season-strip {
     grid-template-columns: 1fr;

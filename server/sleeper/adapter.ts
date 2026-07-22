@@ -104,11 +104,13 @@ function meaningfulWinnerMatches(matches: SleeperBracketMatch[]) {
 }
 
 function meaningfulLoserMatches(matches: SleeperBracketMatch[]) {
-  const lastPlace = Math.max(0, ...matches.map((match) => match.p ?? 0));
+  // Sleeper's consolation bracket is an inverse-seeded path: the worst seeds
+  // receive opening-round byes, then bracket winners continue toward p=1.
+  // In this league, p=1 is the last-place game—not the largest p value.
   return bracketPath(
     matches,
-    matches.find((match) => match.p === lastPlace),
-    "l",
+    matches.find((match) => match.p === 1),
+    "w",
   );
 }
 

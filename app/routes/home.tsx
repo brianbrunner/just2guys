@@ -1,7 +1,6 @@
 import { Link } from "react-router";
 
 import { LiveScoreboard } from "../components/live-scoreboard";
-import { PageHeader } from "../components/page-header";
 import { StandingsTable } from "../components/standings-table";
 import { StatusPill } from "../components/status-pill";
 import { getRequestEnv } from "../lib/server";
@@ -31,8 +30,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   const {
     active,
     featured,
-    seasonCount,
-    managerCount,
     latestWeek,
     latestMatchups,
     archive,
@@ -43,37 +40,15 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   const year = featured?.season.year ?? Number(active?.season.year ?? 2026);
   return (
     <main>
-      <section className="hero wrap">
-        <PageHeader
-          eyebrow="Since 2013 · Yahoo to Sleeper"
-          title="Every season. Every score. All the receipts."
-          description="The living almanac of one needlessly complicated fantasy football league."
-          aside={active && <StatusPill status={active.season.status} />}
-        />
-        <div className="hero-stats" aria-label="League at a glance">
-          <div>
-            <strong>{seasonCount}</strong>
-            <span>seasons tracked</span>
-          </div>
-          <div>
-            <strong>{managerCount}</strong>
-            <span>managers tracked</span>
-          </div>
-          <div>
-            <strong>30 min</strong>
-            <span>live sync target</span>
-          </div>
-        </div>
-      </section>
-
       <section className="section wrap" aria-labelledby="scoreboard-heading">
         <div className="section-heading">
           <div>
             <p className="eyebrow">On the board</p>
-            <h2 id="scoreboard-heading">
+            <h1 id="scoreboard-heading">
               {year} · Week {latestWeek || "—"}
-            </h2>
+            </h1>
           </div>
+          {active && <StatusPill status={active.season.status} />}
           {latestWeek > 0 && (
             <nav className="week-links" aria-label="Current week navigation">
               {latestWeek > 1 && (

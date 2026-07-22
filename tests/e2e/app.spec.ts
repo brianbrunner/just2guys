@@ -1,18 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-test("home renders the seeded archive without serious accessibility issues", async ({
+test("home opens on the current scoreboard without serious accessibility issues", async ({
   page,
 }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", {
-      level: 1,
-      name: "Every season. Every score. All the receipts.",
-    }),
-  ).toBeVisible();
-  await expect(
-    page.locator(".hero-stats").getByText("14", { exact: true }),
+    page.getByRole("heading", { level: 1, name: "2025 · Week 17" }),
   ).toBeVisible();
   const results = await new AxeBuilder({ page }).analyze();
   expect(
@@ -55,6 +49,22 @@ test("the canonical archive has no ties and restores 2023 Week 14", async ({
   expect(recordText).not.toMatch(/\d+–\d+–[1-9]\d*/);
 });
 
+test("week pager replaces the scoreboard with the newly loaded week", async ({
+  page,
+}) => {
+  await page.goto("/seasons/2025/weeks/14");
+  await expect(page.locator(".score-card")).toHaveCount(7);
+
+  await page.getByRole("link", { name: "Next" }).click();
+  await expect(page).toHaveURL(/\/seasons\/2025\/weeks\/15$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Week 15");
+  await expect(page.locator(".score-card")).toHaveCount(6);
+
+  await page.getByRole("link", { name: "Previous" }).click();
+  await expect(page).toHaveURL(/\/seasons\/2025\/weeks\/14$/);
+  await expect(page.locator(".score-card")).toHaveCount(7);
+});
+
 test("record directory filters by description", async ({ page }) => {
   await page.goto("/records");
   await page.getByRole("searchbox", { name: "Find a record" }).fill("bench");
@@ -64,6 +74,41 @@ test("record directory filters by description", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Los Campeones" }),
   ).toHaveCount(0);
+});
+
+test("data tables sort in both directions from accessible headers", async ({
+  page,
+}) => {
+  await page.goto("/managers");
+  const managerHeader = page.getByRole("columnheader", { name: "Manager" });
+  await managerHeader.getByRole("button").click();
+  await expect(managerHeader).toHaveAttribute("aria-sort", "ascending");
+  const ascendingNames = await page
+    .locator(".manager-table tbody th a")
+    .allTextContents();
+  expect(ascendingNames).toEqual(
+    [...ascendingNames].sort((left, right) => left.localeCompare(right)),
+  );
+
+  await managerHeader.getByRole("button").click();
+  await expect(managerHeader).toHaveAttribute("aria-sort", "descending");
+  const descendingNames = await page
+    .locator(".manager-table tbody th a")
+    .allTextContents();
+  expect(descendingNames).toEqual([...ascendingNames].reverse());
+
+  await page.goto("/seasons/2025");
+  const winsHeader = page
+    .locator(".standings-table")
+    .getByRole("columnheader", { name: "W", exact: true });
+  await winsHeader.getByRole("button").click();
+  await expect(winsHeader).toHaveAttribute("aria-sort", "descending");
+  const wins = await page
+    .locator(".standings-table tbody tr td:nth-child(3)")
+    .allTextContents();
+  expect(wins.map(Number)).toEqual(
+    [...wins].map(Number).sort((left, right) => right - left),
+  );
 });
 
 test("mobile pages avoid document-level horizontal overflow", async ({
@@ -85,11 +130,11 @@ test("every public route and JSON status resource returns seeded content", async
   request,
 }) => {
   const pages = [
-    ["/", "Every season. Every score. All the receipts."],
+    ["/", "On the board"],
     ["/seasons", "Season archive"],
     ["/seasons/2025", "2025 · Just 2 Guys 2025"],
     ["/seasons/2025/weeks/17", "Week 17"],
-    ["/matchups/matchup-556528198b67ffbfae55", "vs"],
+    ["/matchups/matchup-b2413e134c390230a879", "vs"],
     ["/managers", "Managers"],
     ["/managers/brian-b", "Brian B"],
     ["/managers/dan", "1 season recorded"],
@@ -237,7 +282,7 @@ test("live scoreboard refreshes, pauses while hidden, and retains scores after f
 const visualPages = [
   ["home", "/"],
   ["season", "/seasons/2025"],
-  ["matchup", "/matchups/matchup-556528198b67ffbfae55"],
+  ["matchup", "/matchups/matchup-b2413e134c390230a879"],
   ["manager", "/managers/brian-b"],
   ["rivalry", "/rivalries/brian-b/rob"],
   ["records", "/records/most-wins"],

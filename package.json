@@ -18,7 +18,7 @@
     "test:e2e": "playwright test",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run build",
     "db:generate": "drizzle-kit generate",
-    "db:migrate:local": "wrangler d1 migrations apply just2guys --local",
+    "db:migrate:local": "node --import tsx server/import/migrate-local.ts",
     "db:migrate:remote": "wrangler d1 migrations apply just2guys --remote",
     "db:seed:local": "node --import tsx server/import/seed-local.ts",
     "db:bootstrap:local": "npm run db:migrate:local && npm run import:legacy && npm run backfill:sleeper && npm run db:seed:local && npm run data:validate",

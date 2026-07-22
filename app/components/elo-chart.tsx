@@ -49,11 +49,10 @@ export function EloChart({ managerName, managerSlug, points }: EloChartProps) {
         aria-labelledby={`elo-title-${managerSlug} elo-description-${managerSlug}`}
       >
         <title id={`elo-title-${managerSlug}`}>
-          {managerName}&apos;s Elo history
+          {`${managerName}'s Elo history`}
         </title>
         <desc id={`elo-description-${managerSlug}`}>
-          Rating after each of {points.length} canonical games, beginning from a
-          1500 baseline and ending at {Math.round(current)}.
+          {`Rating after each of ${points.length} canonical games, beginning from a 1500 baseline and ending at ${Math.round(current)}.`}
         </desc>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -108,11 +107,7 @@ export function EloChart({ managerName, managerSlug, points }: EloChartProps) {
             r="6"
           >
             <title>
-              {point.year} Week {point.week} vs {point.opponents}:{" "}
-              {point.outcome}
-              {" · "}
-              {Math.round(point.rating)} ({point.delta >= 0 ? "+" : ""}
-              {point.delta.toFixed(1)})
+              {`${point.year} Week ${point.week} vs ${point.opponents}: ${point.outcome} · ${Math.round(point.rating)} (${point.delta >= 0 ? "+" : ""}${point.delta.toFixed(1)})`}
             </title>
           </circle>
         ))}

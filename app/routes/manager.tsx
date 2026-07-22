@@ -70,10 +70,6 @@ export default function Manager({ loaderData }: Route.ComponentProps) {
             <div>
               <p className="eyebrow">Power rating</p>
               <h2 id="elo-heading">How good is {manager.name}?</h2>
-              <p>
-                Every canonical game replayed in order. Everyone starts at 1500;
-                beating a stronger manager earns more.
-              </p>
             </div>
             <dl className="elo-summary">
               <div>

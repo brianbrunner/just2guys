@@ -233,7 +233,16 @@ describe("Sleeper boundary adapter", () => {
         ],
         16,
       ),
-    ).toEqual(["placement", "placement", "losers"]);
+    ).toEqual(["losers", "losers", "placement"]);
+    expect(
+      adapt(
+        [
+          [13, 14],
+          [9, 11],
+        ],
+        17,
+      ),
+    ).toEqual(["losers", "placement"]);
   });
 
   it("uses reviewed platform points for a source week with bad custom totals", () => {

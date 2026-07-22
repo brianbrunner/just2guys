@@ -3,11 +3,7 @@ import { PageHeader } from "../components/page-header";
 export default function About() {
   return (
     <main className="wrap page prose-page">
-      <PageHeader
-        eyebrow="Method, not mythology"
-        title="About the archive"
-        description="One league crossed two platforms, several formats, and at least one fake playoff league. This site makes that complexity visible."
-      />
+      <PageHeader eyebrow="Method, not mythology" title="About the archive" />
       <section>
         <h2>What counts</h2>
         <p>

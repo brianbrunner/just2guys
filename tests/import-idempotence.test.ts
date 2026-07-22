@@ -287,8 +287,8 @@ describe.sequential("canonical import", () => {
     expect(rows).toEqual(
       [2023, 2024, 2025].flatMap((year) => [
         { year, phase: "consolation", games: 1 },
-        { year, phase: "losers", games: 3 },
-        { year, phase: "placement", games: 8 },
+        { year, phase: "losers", games: 5 },
+        { year, phase: "placement", games: 6 },
         { year, phase: "winners", games: 7 },
       ]),
     );

@@ -500,6 +500,7 @@ Requirements:
 - Co-managers each receive the team outcome unless a future rule specifies fractional credit.
 - Regular-season, winners-bracket, consolation, losers-bracket, and placement games must remain distinguishable.
 - Postseason pages and statistics include only games on the active championship path, games on the active last-place path, and the final winners-bracket third-place game. Other post-elimination placement games remain retained provider facts with phase `placement`, but they are not canonical league games and never appear in career totals, rivalries, player history, records, or weekly/season matchup lists.
+- For 14-team Sleeper seasons, the active last-place path is a six-team, three-week bracket. The two worst seeds receive inverse opening-round byes, so the canonical path contains two opening games, two second-round games, and the last-place final.
 - Regular-season boundaries are season-specific.
 - A playoff appearance must come from a qualifying winners-bracket berth, not merely playing a late-season consolation game.
 - Platform matchup totals are authoritative.
@@ -685,6 +686,7 @@ Design principles:
 - Clear visual separation between regular season, winners bracket, consolation, and losers bracket.
 - Mobile-first layout.
 - Tables that become useful cards or controlled horizontal views on small screens.
+- Every data-table column is sortable in both directions with keyboard-operable headers and an exposed current sort direction.
 - Brackets that use round tabs or deliberate horizontal navigation on mobile.
 - Meaningful loading, empty, live, final, stale, and error states.
 - No dependence on third-party runtime CSS or font CDNs.
@@ -796,9 +798,9 @@ Completed locally:
 - Reviewed cross-provider identity registry combining the 16 owner-confirmed Yahoo/Sleeper manager pairs without display-name inference. Career totals, championships, rivalries, player history, and co-managed teams now share canonical people across provider eras.
 - Reviewed 2021 and 2022 multi-conference seasons with four explicit stitched Week 17 title games, complete roster mappings, and approved outcomes included in career totals.
 - Reviewed 2023 Week 14 correction selecting populated platform scores over the source's anomalous all-zero `custom_points` values; canonical and remote-import validation require zero finalized ties.
-- Sleeper postseason brackets are reduced to owner-approved meaningful paths: championship progression, last-place progression, and the final third-place game. Eight noncompetitive placement games per single-league 2023–2025 season remain auditable but are excluded from every page and statistic.
+- Sleeper postseason brackets are reduced to owner-approved meaningful paths: championship progression, the five-game inverse-bye last-place path, and the final third-place game. Six noncompetitive placement games per single-league 2023–2025 season remain auditable but are excluded from every page and statistic.
 - Local D1 seeded with 14 seasons, 210 canonical teams, 23 canonical people, 1,072 players, 1,668 matchups, and 45,853 lineup entries; canonical validation and foreign-key checks pass.
-- Strict typecheck, lint, 68 unit/integration tests, production build, and 28 Playwright browser tests pass. Browser coverage includes desktop/mobile responsive checks, Axe accessibility checks, keyboard navigation, required routes/JSON resources, live polling/failure retention/hidden-tab behavior, zero-ties enforcement, review gates, search, overflow, and visual baselines for home, season/bracket, matchup, manager, rivalry, and records.
+- Strict typecheck, lint, 68 unit/integration tests, production build, and 32 Playwright browser tests pass. Browser coverage includes desktop/mobile responsive checks, Axe accessibility checks, keyboard navigation, sortable tables, week-to-week score replacement, required routes/JSON resources, live polling/failure retention/hidden-tab behavior, zero-ties enforcement, review gates, search, overflow, and visual baselines for home, season/bracket, matchup, manager, rivalry, and records.
 - The two large historical SQL imports are split into 244 ordered, checksummed, restart-safe D1 chunks containing 97,035 statements. CI rehearses every chunk against a clean database and requires canonical counts, integrity, foreign keys, and zero finalized ties before production import is permitted.
 - A production release checker blocks deployment while historical reviews, participating identities, D1 configuration, or credential-revocation acknowledgements remain incomplete. Post-deployment verification requires HTTPS SSR content, healthy status, seeded JSON/ETag behavior, and an in-season successful cron run.
 

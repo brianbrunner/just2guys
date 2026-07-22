@@ -67,6 +67,12 @@ export function LiveScoreboard({
   );
 
   useEffect(() => {
+    setMatchups(initialMatchups);
+    setFreshness(initialFreshness);
+    setFailed(false);
+  }, [endpoint, initialFreshness, initialMatchups]);
+
+  useEffect(() => {
     if (!poll) return;
     let disposed = false;
     async function refresh() {

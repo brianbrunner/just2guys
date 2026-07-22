@@ -1,35 +1,8 @@
-import { readdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
-async function findLocalDatabase() {
-  const directory = resolve(".wrangler/state/v3/d1/miniflare-D1DatabaseObject");
-  const entries = await readdir(directory, { withFileTypes: true });
-  const candidates = entries
-    .filter(
-      (entry) =>
-        entry.isFile() &&
-        entry.name.endsWith(".sqlite") &&
-        entry.name !== "metadata.sqlite",
-    )
-    .map((entry) => resolve(directory, entry.name));
-  const initialized = candidates.filter((path) => {
-    const database = new DatabaseSync(path, { readOnly: true });
-    const row = database
-      .prepare(
-        "SELECT COUNT(*) count FROM sqlite_master WHERE type='table' AND name='seasons'",
-      )
-      .get() as { count: number };
-    database.close();
-    return row.count === 1;
-  });
-  if (initialized.length !== 1) {
-    throw new Error(
-      `Expected exactly one migrated local D1 database, found ${initialized.length}. Run npm run db:migrate:local first.`,
-    );
-  }
-  return initialized[0];
-}
+import { findLocalDatabase } from "./local-d1";
 
 const databasePath = await findLocalDatabase();
 const [legacySql, sleeperSql] = await Promise.all([

@@ -14,11 +14,7 @@ export default function Records() {
   );
   return (
     <main className="wrap page">
-      <PageHeader
-        eyebrow="Hall of fame & shame"
-        title="Records"
-        description="Fifteen ways to remember the great, the terrible, and the suspiciously specific."
-      />
+      <PageHeader eyebrow="Hall of fame & shame" title="Records" />
       <label className="record-search">
         <span>Find a record</span>
         <input

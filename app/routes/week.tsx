@@ -28,7 +28,6 @@ export default function Week({ loaderData }: Route.ComponentProps) {
       <PageHeader
         eyebrow={`${season.name} · ${season.year}`}
         title={`Week ${week}`}
-        description="Final scores are preserved exactly as reported, except for visible reviewed corrections."
       />
       <div className="week-pager">
         <Link to={`/seasons/${season.year}/weeks/${Math.max(1, week - 1)}`}>

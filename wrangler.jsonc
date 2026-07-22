@@ -16,6 +16,7 @@
       "binding": "DB",
       "database_name": "just2guys",
       "database_id": "251049ea-cc08-429e-a6d2-3a84395a9c3b",
+      "preview_database_id": "251049ea-cc08-429e-a6d2-3a84395a9c3b",
       "migrations_dir": "server/db/migrations",
     },
   ],

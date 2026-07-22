@@ -65,7 +65,7 @@ Five legacy manually merged playoff totals included IR points because the old ca
 
 The league has no legitimate tied games. Sleeper's 2023 Week 14 payload contains real platform scores but an all-zero `custom_points` field, which previously created seven false ties. Manifest version 2 uses platform `points` for only that source week and records the reviewed correction in [`docs/reconciliation/2023.md`](docs/reconciliation/2023.md). Canonical validation fails if any finalized tie remains.
 
-Postseason weeks include only matchups that still determine the championship or last place, plus the final winners-bracket third-place game. Sleeper's other post-elimination placement matchups are preserved with phase `placement` for auditability but are excluded from week/season pages and all career, rivalry, player, and record statistics.
+Postseason weeks include only matchups that still determine the championship or last place, plus the final winners-bracket third-place game. In the 14-team seasons, the six-team last-place bracket spans three weeks: two opening games, two second-round games after inverse byes for the two worst seeds, and the last-place final. Sleeper's other post-elimination placement matchups are preserved with phase `placement` for auditability but are excluded from week/season pages and all career, rivalry, player, and record statistics.
 
 Manager profiles also include an Elo history derived from those same canonical games. Everyone starts at 1500, games use a K-factor of 20 and the standard 400-point expectation curve, and score margin is intentionally ignored. Co-managed teams use their managers' average entering rating and give each co-manager the same adjustment.
 

@@ -13,11 +13,7 @@ export async function loader({ context }: Route.LoaderArgs) {
 export default function Seasons({ loaderData }: Route.ComponentProps) {
   return (
     <main className="wrap page">
-      <PageHeader
-        eyebrow="2013 to now"
-        title="Season archive"
-        description="Formats changed, platforms changed, the grudges did not."
-      />
+      <PageHeader eyebrow="2013 to now" title="Season archive" />
       <div className="archive-grid">
         {loaderData.map((season) => (
           <article className="archive-card" key={season.id}>

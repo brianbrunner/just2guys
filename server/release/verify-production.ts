@@ -26,7 +26,7 @@ async function response(path: string) {
 }
 
 const expectedPages = [
-  ["/", "Every season. Every score. All the receipts."],
+  ["/", "On the board"],
   ["/seasons", "Season archive"],
   ["/managers", "Managers"],
   ["/records", "Records"],
