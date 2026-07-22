@@ -800,7 +800,7 @@ Completed locally:
 - Reviewed 2023 Week 14 correction selecting populated platform scores over the source's anomalous all-zero `custom_points` values; canonical and remote-import validation require zero finalized ties.
 - Sleeper postseason brackets are reduced to owner-approved meaningful paths: championship progression, the five-game inverse-bye last-place path, and the final third-place game. Six noncompetitive placement games per single-league 2023–2025 season remain auditable but are excluded from every page and statistic.
 - Local D1 seeded with 14 seasons, 210 canonical teams, 23 canonical people, 1,072 players, 1,668 matchups, and 45,853 lineup entries; canonical validation and foreign-key checks pass.
-- Strict typecheck, lint, 68 unit/integration tests, production build, and 32 Playwright browser tests pass. Browser coverage includes desktop/mobile responsive checks, Axe accessibility checks, keyboard navigation, sortable tables, week-to-week score replacement, required routes/JSON resources, live polling/failure retention/hidden-tab behavior, zero-ties enforcement, review gates, search, overflow, and visual baselines for home, season/bracket, matchup, manager, rivalry, and records.
+- Strict typecheck, lint, 68 unit/integration tests, production build, and 20 Playwright browser tests pass. Browser coverage stays focused on desktop/mobile behavior, Axe accessibility checks, keyboard navigation, sortable tables, week-to-week score replacement, required routes/JSON resources, live polling/failure retention/hidden-tab behavior, zero-ties enforcement, review gates, search, and overflow.
 - The two large historical SQL imports are split into 244 ordered, checksummed, restart-safe D1 chunks containing 97,035 statements. CI rehearses every chunk against a clean database and requires canonical counts, integrity, foreign keys, and zero finalized ties before production import is permitted.
 - A production release checker blocks deployment while historical reviews, participating identities, D1 configuration, or credential-revocation acknowledgements remain incomplete. Post-deployment verification requires HTTPS SSR content, healthy status, seeded JSON/ETag behavior, and an in-season successful cron run.
 
@@ -866,7 +866,7 @@ Exit condition: all current product capabilities have a tested domain implementa
 
 - Produce focused design prototypes.
 - Implement the design system and required pages.
-- Add responsive, accessibility, and visual-regression coverage.
+- Add focused responsive, accessibility, and interaction coverage.
 
 Exit condition: all pages work on phone and desktop, meet accessibility gates, and display seeded historical data correctly.
 

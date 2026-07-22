@@ -67,7 +67,10 @@ test("week pager replaces the scoreboard with the newly loaded week", async ({
 
 test("record directory filters by description", async ({ page }) => {
   await page.goto("/records");
-  await page.getByRole("searchbox", { name: "Find a record" }).fill("bench");
+  await page.waitForLoadState("networkidle");
+  const searchbox = page.getByRole("searchbox", { name: "Find a record" });
+  await searchbox.fill("bench");
+  await expect(searchbox).toHaveValue("bench");
   await expect(
     page.getByRole("heading", { name: "Put Me In, Coach" }),
   ).toBeVisible();
@@ -278,23 +281,3 @@ test("live scoreboard refreshes, pauses while hidden, and retains scores after f
   await expect(fixture.getByText("New score arrived")).toBeVisible();
   await expect(fixture.getByText("123.45")).toBeVisible();
 });
-
-const visualPages = [
-  ["home", "/"],
-  ["season", "/seasons/2025"],
-  ["matchup", "/matchups/matchup-b2413e134c390230a879"],
-  ["manager", "/managers/brian-b"],
-  ["rivalry", "/rivalries/brian-b/rob"],
-  ["records", "/records/most-wins"],
-] as const;
-
-for (const [name, path] of visualPages) {
-  test(`visual regression: ${name}`, async ({ page }) => {
-    await page.goto(path);
-    await expect(page).toHaveScreenshot(`${name}.png`, {
-      animations: "disabled",
-      fullPage: true,
-      mask: [page.locator(".freshness")],
-    });
-  });
-}

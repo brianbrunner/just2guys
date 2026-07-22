@@ -166,7 +166,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser suite covers every public route, desktop and mobile rendering, review gates, interactive record filtering, stale/error states, document overflow, visual snapshots, keyboard focus, and serious/critical Axe violations.
+The browser suite covers the key public routes, desktop and mobile behavior, review gates, interactive record filtering and table sorting, week navigation, stale/error states, document overflow, keyboard focus, and serious/critical Axe violations.
 
 ## Production deployment
 
