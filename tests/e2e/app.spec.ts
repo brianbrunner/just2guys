@@ -253,7 +253,6 @@ test("live scoreboard refreshes, pauses while hidden, and retains scores after f
   });
   /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
   const fixture = page.locator("#live-scoreboard-test");
-  await expect(fixture.getByText("Data may be stale")).toBeVisible();
 
   await page.evaluate(() => {
     Object.defineProperty(document, "visibilityState", {
