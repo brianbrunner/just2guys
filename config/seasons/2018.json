@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "year": 2018,
+  "slug": "2018",
+  "name": "Just2Guys Field of Memes",
+  "status": "complete",
+  "regularSeasonStartWeek": 1,
+  "regularSeasonEndWeek": 13,
+  "playoffStartWeek": 14,
+  "finalWeek": 16,
+  "teamCount": 16,
+  "structure": "single",
+  "visible": true,
+  "sources": [
+    {
+      "provider": "yahoo",
+      "externalId": "380.l.906329",
+      "role": "full",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 16,
+      "canonicalWeekOffset": 0,
+      "priority": 0,
+      "enabled": true
+    }
+  ],
+  "standingsTiebreakers": ["wins", "ties", "points_for", "display_name"],
+  "outcomes": {
+    "championExternalRosterId": "380.l.906329.t.11",
+    "lastPlaceExternalRosterId": "380.l.906329.t.4"
+  },
+  "rosterMappings": {},
+  "corrections": [
+    {
+      "id": "2018-week14-super-mariota-ir-total",
+      "kind": "matchup_team_points",
+      "targetType": "matchup_team",
+      "targetId": "380.l.906329.14.380.l.906329.t.16.380.l.906329.t.12:380.l.906329.t.12",
+      "patch": { "points": 72.6 },
+      "reason": "The legacy manual playoff merger counted Jamison Crowder's 14.7 IR points because it excluded BN but not IR. Canonical starter total excludes IR.",
+      "reviewedBy": "league-owner",
+      "reviewedAt": "2026-07-21T00:00:00.000Z"
+    }
+  ],
+  "review": {
+    "status": "reviewed",
+    "reviewedBy": "legacy-audit",
+    "reviewedAt": "2026-07-21",
+    "notes": "Outcomes verified against the immutable legacy SQLite source."
+  }
+}

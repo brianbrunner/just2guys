@@ -1,0 +1,75 @@
+{
+  "version": 2,
+  "year": 2023,
+  "slug": "2023",
+  "name": "Just 2 Guys 2023",
+  "status": "complete",
+  "regularSeasonStartWeek": 1,
+  "regularSeasonEndWeek": 14,
+  "playoffStartWeek": 15,
+  "finalWeek": 17,
+  "teamCount": 14,
+  "structure": "single",
+  "visible": true,
+  "sources": [
+    {
+      "provider": "sleeper",
+      "externalId": "995467206685184000",
+      "role": "full",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 17,
+      "canonicalWeekOffset": 0,
+      "priority": 10,
+      "enabled": true,
+      "platformScoreWeeks": [14]
+    },
+    {
+      "provider": "sleeper",
+      "externalId": "914704279427076096",
+      "role": "supplemental",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 17,
+      "canonicalWeekOffset": 0,
+      "priority": 0,
+      "enabled": false,
+      "ignoredReason": "Empty Whiskeys rollover league."
+    },
+    {
+      "provider": "sleeper",
+      "externalId": "914703464024956928",
+      "role": "supplemental",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 17,
+      "canonicalWeekOffset": 0,
+      "priority": 0,
+      "enabled": false,
+      "ignoredReason": "Empty Tequilas rollover league."
+    }
+  ],
+  "standingsTiebreakers": ["wins", "ties", "points_for", "display_name"],
+  "outcomes": {
+    "championExternalRosterId": "995467206685184000:9",
+    "lastPlaceExternalRosterId": "995467206685184000:13"
+  },
+  "rosterMappings": {},
+  "corrections": [
+    {
+      "id": "2023-week-14-zero-custom-points",
+      "kind": "score_source",
+      "targetType": "source_week",
+      "targetId": "995467206685184000:14",
+      "patch": {
+        "usePlatformPoints": true
+      },
+      "reason": "Sleeper reports custom_points=0 for every Week 14 roster despite populated platform points and lineups, creating seven false 0-0 ties. The league owner confirmed there were no ties.",
+      "reviewedBy": "league-owner",
+      "reviewedAt": "2026-07-21T00:00:00.000Z"
+    }
+  ],
+  "review": {
+    "status": "reviewed",
+    "reviewedBy": "public-api-reconciliation",
+    "reviewedAt": "2026-07-21",
+    "notes": "Champion is the winner of winners-bracket placement 1; last place is the loser of the maximum-placement consolation match. Week 14 uses Sleeper platform points because the source's all-zero custom_points values are a reviewed data anomaly."
+  }
+}

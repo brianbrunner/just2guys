@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "year": 2013,
+  "slug": "2013",
+  "name": "Just 2 Guys",
+  "status": "complete",
+  "regularSeasonStartWeek": 1,
+  "regularSeasonEndWeek": 13,
+  "playoffStartWeek": 14,
+  "finalWeek": 16,
+  "teamCount": 14,
+  "structure": "single",
+  "visible": true,
+  "sources": [
+    {
+      "provider": "yahoo",
+      "externalId": "314.l.818997",
+      "role": "full",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 16,
+      "canonicalWeekOffset": 0,
+      "priority": 0,
+      "enabled": true
+    }
+  ],
+  "standingsTiebreakers": ["wins", "ties", "points_for", "display_name"],
+  "outcomes": {
+    "championExternalRosterId": "314.l.818997.t.3",
+    "lastPlaceExternalRosterId": "314.l.818997.t.9"
+  },
+  "rosterMappings": {},
+  "corrections": [],
+  "review": {
+    "status": "reviewed",
+    "reviewedBy": "legacy-audit",
+    "reviewedAt": "2026-07-21",
+    "notes": "Outcomes verified against the immutable legacy SQLite source."
+  }
+}

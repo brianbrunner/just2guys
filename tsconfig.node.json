@@ -1,0 +1,33 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "vite.config.ts",
+    "react-router.config.ts",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "drizzle.config.ts",
+    "eslint.config.js",
+    "server/import/**/*",
+    "server/identity/**/*",
+    "server/domain/dataset.ts",
+    "server/domain/elo.ts",
+    "server/domain/records.ts",
+    "server/domain/standings.ts",
+    "server/manifests/**/*",
+    "server/sleeper/**/*",
+    "server/security/**/*",
+    "server/release/**/*",
+    "server/sync/**/*",
+    "config/**/*",
+    "tests/**/*"
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "strict": true,
+    "types": ["node"],
+    "lib": ["DOM", "ES2022"],
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler"
+  }
+}

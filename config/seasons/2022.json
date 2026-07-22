@@ -1,0 +1,105 @@
+{
+  "version": 2,
+  "year": 2022,
+  "slug": "2022",
+  "name": "Just 2 Guys — Whiskeys vs Tequilas",
+  "status": "complete",
+  "regularSeasonStartWeek": 1,
+  "regularSeasonEndWeek": 14,
+  "playoffStartWeek": 15,
+  "finalWeek": 17,
+  "teamCount": 16,
+  "structure": "grouped",
+  "visible": true,
+  "notes": "Whiskeys and Tequilas played as conferences through Week 16. Their unpaired Week 17 scores supply only the reviewed cross-conference championship and last-place games.",
+  "sources": [
+    {
+      "provider": "sleeper",
+      "externalId": "864551860646821888",
+      "role": "full",
+      "groupLabel": "Whiskeys",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 17,
+      "canonicalWeekOffset": 0,
+      "priority": 10,
+      "enabled": true,
+      "includeUnpairedMatchups": false
+    },
+    {
+      "provider": "sleeper",
+      "externalId": "864551551908352000",
+      "role": "full",
+      "groupLabel": "Tequilas",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 17,
+      "canonicalWeekOffset": 0,
+      "priority": 10,
+      "enabled": true,
+      "includeUnpairedMatchups": false
+    },
+    {
+      "provider": "sleeper",
+      "externalId": "860767078171414528",
+      "role": "supplemental",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 17,
+      "canonicalWeekOffset": 0,
+      "priority": 0,
+      "enabled": false,
+      "ignoredReason": "Empty rollover league; its template bracket is not part of the reviewed two-conference season."
+    }
+  ],
+  "standingsTiebreakers": ["wins", "ties", "points_for", "display_name"],
+  "outcomes": {
+    "championExternalRosterId": "864551860646821888:6",
+    "lastPlaceExternalRosterId": "864551860646821888:7"
+  },
+  "stitchedMatchups": [
+    {
+      "id": "ultimate-championship",
+      "week": 17,
+      "phase": "winners",
+      "round": 3,
+      "placementLabel": "Ultimate championship",
+      "sides": [
+        {
+          "sourceExternalRosterId": "864551860646821888:6",
+          "sourceWeek": 17,
+          "expectedPoints": 110.08
+        },
+        {
+          "sourceExternalRosterId": "864551551908352000:7",
+          "sourceWeek": 17,
+          "expectedPoints": 98.68
+        }
+      ]
+    },
+    {
+      "id": "ultimate-last-place",
+      "week": 17,
+      "phase": "losers",
+      "round": 3,
+      "placementLabel": "Ultimate last place",
+      "sides": [
+        {
+          "sourceExternalRosterId": "864551860646821888:7",
+          "sourceWeek": 17,
+          "expectedPoints": 69.28
+        },
+        {
+          "sourceExternalRosterId": "864551551908352000:8",
+          "sourceWeek": 17,
+          "expectedPoints": 102.58
+        }
+      ]
+    }
+  ],
+  "rosterMappings": {},
+  "corrections": [],
+  "review": {
+    "status": "reviewed",
+    "reviewedBy": "league-owner",
+    "reviewedAt": "2026-07-21",
+    "notes": "Owner approved the reconstructed conference brackets, Week 17 title games, Brian K as champion, and Julio as last place."
+  }
+}

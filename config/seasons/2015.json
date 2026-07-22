@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "year": 2015,
+  "slug": "2015",
+  "name": "Just 2 Guys 3",
+  "status": "complete",
+  "regularSeasonStartWeek": 1,
+  "regularSeasonEndWeek": 13,
+  "playoffStartWeek": 14,
+  "finalWeek": 16,
+  "teamCount": 14,
+  "structure": "single",
+  "visible": true,
+  "sources": [
+    {
+      "provider": "yahoo",
+      "externalId": "348.l.1060011",
+      "role": "full",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 16,
+      "canonicalWeekOffset": 0,
+      "priority": 0,
+      "enabled": true
+    }
+  ],
+  "standingsTiebreakers": ["wins", "ties", "points_for", "display_name"],
+  "outcomes": {
+    "championExternalRosterId": "348.l.1060011.t.12",
+    "lastPlaceExternalRosterId": "348.l.1060011.t.8"
+  },
+  "rosterMappings": {},
+  "corrections": [],
+  "review": {
+    "status": "reviewed",
+    "reviewedBy": "legacy-audit",
+    "reviewedAt": "2026-07-21",
+    "notes": "Outcomes verified against the immutable legacy SQLite source."
+  }
+}

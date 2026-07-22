@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "year": 2016,
+  "slug": "2016",
+  "name": "Just 2 Guys 69",
+  "status": "complete",
+  "regularSeasonStartWeek": 1,
+  "regularSeasonEndWeek": 13,
+  "playoffStartWeek": 14,
+  "finalWeek": 16,
+  "teamCount": 14,
+  "structure": "single",
+  "visible": true,
+  "sources": [
+    {
+      "provider": "yahoo",
+      "externalId": "359.l.854870",
+      "role": "full",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 16,
+      "canonicalWeekOffset": 0,
+      "priority": 0,
+      "enabled": true
+    }
+  ],
+  "standingsTiebreakers": ["wins", "ties", "points_for", "display_name"],
+  "outcomes": {
+    "championExternalRosterId": "359.l.854870.t.13",
+    "lastPlaceExternalRosterId": "359.l.854870.t.7"
+  },
+  "rosterMappings": {},
+  "corrections": [
+    {
+      "id": "2016-week14-badonkagronk-ir-total",
+      "kind": "matchup_team_points",
+      "targetType": "matchup_team",
+      "targetId": "359.l.854870.14.359.l.854870.t.14.359.l.854870.t.9:359.l.854870.t.14",
+      "patch": { "points": 82.24 },
+      "reason": "The legacy manual playoff merger counted Charles Sims's 5.0 IR points because it excluded BN but not IR. Canonical starter total excludes IR.",
+      "reviewedBy": "league-owner",
+      "reviewedAt": "2026-07-21T00:00:00.000Z"
+    },
+    {
+      "id": "2016-week15-colludhism-ir-total",
+      "kind": "matchup_team_points",
+      "targetType": "matchup_team",
+      "targetId": "359.l.854870.15.359.l.854870.t.1.359.l.854870.t.4:359.l.854870.t.1",
+      "patch": { "points": 102.46 },
+      "reason": "The legacy manual playoff merger counted Adrian Peterson's 0.3 IR points because it excluded BN but not IR. Canonical starter total excludes IR.",
+      "reviewedBy": "league-owner",
+      "reviewedAt": "2026-07-21T00:00:00.000Z"
+    }
+  ],
+  "review": {
+    "status": "reviewed",
+    "reviewedBy": "legacy-audit",
+    "reviewedAt": "2026-07-21",
+    "notes": "Outcomes verified against the immutable legacy SQLite source."
+  }
+}

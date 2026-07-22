@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "year": 2026,
+  "slug": "2026",
+  "name": "Just 2 Guys 2026",
+  "status": "pre_draft",
+  "regularSeasonStartWeek": 1,
+  "regularSeasonEndWeek": 14,
+  "playoffStartWeek": 15,
+  "finalWeek": 17,
+  "teamCount": 14,
+  "structure": "single",
+  "visible": true,
+  "sources": [
+    {
+      "provider": "sleeper",
+      "externalId": "1312112369765212160",
+      "role": "full",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 17,
+      "canonicalWeekOffset": 0,
+      "priority": 10,
+      "enabled": true
+    }
+  ],
+  "standingsTiebreakers": ["wins", "ties", "points_for", "display_name"],
+  "rosterMappings": {},
+  "corrections": [],
+  "review": {
+    "status": "needs_review",
+    "notes": "Active pre-draft season; metadata may change before kickoff."
+  }
+}

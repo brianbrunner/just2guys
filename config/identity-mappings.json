@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "reviewedBy": "league-owner",
+  "reviewedAt": "2026-07-21",
+  "mappings": [
+    {
+      "slug": "manoli",
+      "preferredName": "Manoli",
+      "yahooGuid": "P7IBQBPT7QSQRBCUCQDBEJNVGE",
+      "sleeperUserId": "721851873342074880",
+      "aliases": ["Manoli", "liodakis"]
+    },
+    {
+      "slug": "julio",
+      "preferredName": "Julio",
+      "yahooGuid": "CGUTEDXU5IR24CKII7LT5QGICM",
+      "sleeperUserId": "721080202641371136",
+      "aliases": ["Julio", "mcjoules"]
+    },
+    {
+      "slug": "brian-b",
+      "preferredName": "Brian B",
+      "yahooGuid": "AZKFFOK2V7WIYF6BQVYPK6PKOA",
+      "sleeperUserId": "467455957719314432",
+      "aliases": ["Brian B", "NotTheWorstDad"]
+    },
+    {
+      "slug": "babacar",
+      "preferredName": "Babacar",
+      "yahooGuid": "BYCR5LHCTCEJNHZ752F266UO74",
+      "sleeperUserId": "466723835656269824",
+      "aliases": ["Babacar", "bcn"]
+    },
+    {
+      "slug": "ross",
+      "preferredName": "Ross",
+      "yahooGuid": "DKW3YX4S4KGXDKJOZ3CSMZITQQ",
+      "sleeperUserId": "722187489267220480",
+      "aliases": ["Ross", "rossdarwin"]
+    },
+    {
+      "slug": "julian",
+      "preferredName": "Julian",
+      "yahooGuid": "IFCNF63RFT3SLUJY4BKA7XPRPA",
+      "sleeperUserId": "472854397848645632",
+      "aliases": ["Julian", "jspindell"]
+    },
+    {
+      "slug": "simon",
+      "preferredName": "Simon",
+      "yahooGuid": "PH7Y3UCTNVGVYQYTARTVXUWJOY",
+      "sleeperUserId": "722348110474452992",
+      "aliases": ["Simon", "yesimon"]
+    },
+    {
+      "slug": "jwitt",
+      "preferredName": "Jwitt",
+      "yahooGuid": "VID5FKDJWYOB4UVQCNFVNNSLQY",
+      "sleeperUserId": "722197514803044352",
+      "aliases": ["Jwitt", "jwitt90"]
+    },
+    {
+      "slug": "emilio",
+      "preferredName": "Emilio",
+      "yahooGuid": "G627P5CQWWO422R6W5G7URKSGA",
+      "sleeperUserId": "98153175760388096",
+      "aliases": ["Emilio", "bunnyrampage"]
+    },
+    {
+      "slug": "brian-k",
+      "preferredName": "Brian K",
+      "yahooGuid": "3YAWEDYUCRQ5O6MOKWG75XIO74",
+      "sleeperUserId": "722537243222286336",
+      "aliases": ["Brian K", "bkooiman"]
+    },
+    {
+      "slug": "breanna",
+      "preferredName": "Breanna",
+      "yahooGuid": "3LKM2POEBESCMVIFIP57H7RNVA",
+      "sleeperUserId": "721861371729362944",
+      "aliases": ["Breanna", "BreAlvaradoJones"]
+    },
+    {
+      "slug": "enrikson",
+      "preferredName": "Enrikson",
+      "yahooGuid": "LA7XOMI2WWRMUQOEQTX32Y6QZ4",
+      "sleeperUserId": "604409518721400832",
+      "aliases": ["Enrikson", "bunnymageEE"]
+    },
+    {
+      "slug": "aaron",
+      "preferredName": "Aaron",
+      "yahooGuid": "3RVJ4O5DMFIYJA6CHPVWUUV6UQ",
+      "sleeperUserId": "721071446712991744",
+      "aliases": ["Aaron", "aaronlewism", "poop_monkey"]
+    },
+    {
+      "slug": "mike",
+      "preferredName": "Mike",
+      "yahooGuid": "VGX3MHMJRUIFXWBP3M7OK7M2NA",
+      "sleeperUserId": "721881692654104576",
+      "aliases": ["Michael", "Mike", "mikeeatsbutts"]
+    },
+    {
+      "slug": "rob",
+      "preferredName": "Rob",
+      "yahooGuid": "XSB73EXNIRTCJBOIG37P33BALQ",
+      "sleeperUserId": "721098410962251776",
+      "aliases": ["Rob", "rconroy293"]
+    },
+    {
+      "slug": "dan",
+      "preferredName": "Dan",
+      "sleeperUserId": "788252313520320512",
+      "aliases": ["Dan", "yuzeh"]
+    },
+    {
+      "slug": "ashley",
+      "preferredName": "Ashley",
+      "yahooGuid": "WSRBYH5D4E25XY7STFVH7QQNKA",
+      "sleeperUserId": "722600873687064576",
+      "aliases": ["Ashley", "McTitans"]
+    }
+  ]
+}

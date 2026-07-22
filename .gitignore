@@ -1,0 +1,25 @@
+.DS_Store
+.env
+/node_modules/
+*.tsbuildinfo
+
+# React Router
+/.react-router/
+/build/
+/coverage/
+/playwright-report/
+/test-results/
+/backups/
+/generated/*
+!/generated/sleeper-backfill/
+/generated/sleeper-backfill/*
+!/generated/sleeper-backfill/snapshots.json
+
+# Cloudflare
+.mf
+.wrangler
+.dev.vars*
+worker-configuration.d.ts
+
+!.dev.vars.example
+!.env.example

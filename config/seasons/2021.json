@@ -1,0 +1,144 @@
+{
+  "version": 2,
+  "year": 2021,
+  "slug": "2021",
+  "name": "Just 2 Guys — Evens vs Odds",
+  "status": "complete",
+  "regularSeasonStartWeek": 1,
+  "regularSeasonEndWeek": 14,
+  "playoffStartWeek": 15,
+  "finalWeek": 17,
+  "teamCount": 16,
+  "structure": "grouped",
+  "visible": true,
+  "notes": "Evens and Odds played as conferences through Week 16. Reviewed repair-league Week 17 scores supply only the cross-conference championship and last-place games.",
+  "sources": [
+    {
+      "provider": "sleeper",
+      "externalId": "737467001143988224",
+      "role": "full",
+      "groupLabel": "Evens",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 16,
+      "canonicalWeekOffset": 0,
+      "priority": 10,
+      "enabled": true
+    },
+    {
+      "provider": "sleeper",
+      "externalId": "737466838908329984",
+      "role": "full",
+      "groupLabel": "Odds",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 16,
+      "canonicalWeekOffset": 0,
+      "priority": 10,
+      "enabled": true
+    },
+    {
+      "provider": "sleeper",
+      "externalId": "781405019735105536",
+      "role": "supplemental",
+      "groupLabel": "Evens repair",
+      "sourceWeekStart": 17,
+      "sourceWeekEnd": 17,
+      "canonicalWeekOffset": 0,
+      "priority": 20,
+      "enabled": true,
+      "importMatchups": false
+    },
+    {
+      "provider": "sleeper",
+      "externalId": "781384564496064512",
+      "role": "supplemental",
+      "groupLabel": "Odds repair",
+      "sourceWeekStart": 17,
+      "sourceWeekEnd": 17,
+      "canonicalWeekOffset": 0,
+      "priority": 20,
+      "enabled": true,
+      "importMatchups": false
+    },
+    {
+      "provider": "sleeper",
+      "externalId": "720897275471155200",
+      "role": "supplemental",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 17,
+      "canonicalWeekOffset": 0,
+      "priority": 0,
+      "enabled": false,
+      "ignoredReason": "Separate 16-team candidate with materially different scores; not part of the reviewed two-conference season."
+    }
+  ],
+  "standingsTiebreakers": ["wins", "ties", "points_for", "display_name"],
+  "outcomes": {
+    "championExternalRosterId": "737466838908329984:2",
+    "lastPlaceExternalRosterId": "737466838908329984:5"
+  },
+  "stitchedMatchups": [
+    {
+      "id": "ultimate-championship",
+      "week": 17,
+      "phase": "winners",
+      "round": 3,
+      "placementLabel": "Ultimate championship",
+      "sides": [
+        {
+          "sourceExternalRosterId": "781405019735105536:3",
+          "sourceWeek": 17,
+          "expectedPoints": 126.26
+        },
+        {
+          "sourceExternalRosterId": "781384564496064512:1",
+          "sourceWeek": 17,
+          "expectedPoints": 155.1
+        }
+      ]
+    },
+    {
+      "id": "ultimate-last-place",
+      "week": 17,
+      "phase": "losers",
+      "round": 3,
+      "placementLabel": "Ultimate last place",
+      "sides": [
+        {
+          "sourceExternalRosterId": "781405019735105536:6",
+          "sourceWeek": 17,
+          "expectedPoints": 134.2
+        },
+        {
+          "sourceExternalRosterId": "781384564496064512:7",
+          "sourceWeek": 17,
+          "expectedPoints": 117.54
+        }
+      ]
+    }
+  ],
+  "rosterMappings": {
+    "781405019735105536:1": "737466838908329984:4",
+    "781405019735105536:2": "737467001143988224:1",
+    "781405019735105536:3": "737467001143988224:8",
+    "781405019735105536:4": "737467001143988224:2",
+    "781405019735105536:5": "737467001143988224:3",
+    "781405019735105536:6": "737467001143988224:6",
+    "781405019735105536:7": "737467001143988224:4",
+    "781405019735105536:8": "737467001143988224:7",
+    "781384564496064512:1": "737466838908329984:2",
+    "781384564496064512:2": "737466838908329984:1",
+    "781384564496064512:3": "737466838908329984:3",
+    "781384564496064512:4": "737466838908329984:6",
+    "781384564496064512:5": "737466838908329984:4",
+    "781384564496064512:6": "737466838908329984:7",
+    "781384564496064512:7": "737466838908329984:5",
+    "781384564496064512:8": "737467001143988224:1"
+  },
+  "corrections": [],
+  "review": {
+    "status": "reviewed",
+    "reviewedBy": "league-owner",
+    "reviewedAt": "2026-07-21",
+    "notes": "Owner approved the reconstructed conference brackets, repair-league Week 17 title games, Rob as champion, and Breanna as last place."
+  }
+}

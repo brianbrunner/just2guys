@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "year": 2020,
+  "slug": "2020",
+  "name": "Just 2 Guys La Liga vs Bundesliga",
+  "status": "complete",
+  "regularSeasonStartWeek": 1,
+  "regularSeasonEndWeek": 13,
+  "playoffStartWeek": 14,
+  "finalWeek": 16,
+  "teamCount": 16,
+  "structure": "grouped",
+  "visible": true,
+  "sources": [
+    {
+      "provider": "yahoo",
+      "externalId": "399.l.1026513",
+      "role": "full",
+      "groupLabel": "La Liga",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 16,
+      "canonicalWeekOffset": 0,
+      "priority": 10,
+      "enabled": true
+    },
+    {
+      "provider": "yahoo",
+      "externalId": "399.l.1079660",
+      "role": "supplemental",
+      "groupLabel": "Bundesliga",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 16,
+      "canonicalWeekOffset": 0,
+      "priority": 10,
+      "enabled": true
+    }
+  ],
+  "standingsTiebreakers": ["wins", "ties", "points_for", "display_name"],
+  "outcomes": {
+    "championExternalRosterId": "399.l.1026513.t.4",
+    "lastPlaceExternalRosterId": "399.l.1026513.t.6"
+  },
+  "rosterMappings": {},
+  "corrections": [
+    {
+      "id": "2020-week14-super-lamario-ir-total",
+      "kind": "matchup_team_points",
+      "targetType": "matchup_team",
+      "targetId": "399.l.1026513.14.399.l.1079660.t.6.399.l.1079660.t.2:399.l.1079660.t.2",
+      "patch": { "points": 118.42 },
+      "reason": "The legacy manual playoff merger counted Josh Jacobs's 8.9 IR points because it excluded BN but not IR. Canonical starter total excludes IR.",
+      "reviewedBy": "league-owner",
+      "reviewedAt": "2026-07-21T00:00:00.000Z"
+    },
+    {
+      "id": "2020-week14-fresh-prince-ir-total",
+      "kind": "matchup_team_points",
+      "targetType": "matchup_team",
+      "targetId": "399.l.1026513.14.399.l.1026513.t.1.399.l.1026513.t.5:399.l.1026513.t.5",
+      "patch": { "points": 128.12 },
+      "reason": "The legacy manual playoff merger counted Curtis Samuel's 12.5 IR points because it excluded BN but not IR. Canonical starter total excludes IR.",
+      "reviewedBy": "league-owner",
+      "reviewedAt": "2026-07-21T00:00:00.000Z"
+    }
+  ],
+  "review": {
+    "status": "reviewed",
+    "reviewedBy": "legacy-audit",
+    "reviewedAt": "2026-07-21",
+    "notes": "Merged La Liga and Bundesliga and final outcomes verified against the immutable legacy SQLite source."
+  }
+}

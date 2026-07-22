@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "year": 2019,
+  "slug": "2019",
+  "name": "Just 2 Guys Avengers vs Champions",
+  "status": "complete",
+  "regularSeasonStartWeek": 1,
+  "regularSeasonEndWeek": 13,
+  "playoffStartWeek": 14,
+  "finalWeek": 16,
+  "teamCount": 16,
+  "structure": "grouped",
+  "visible": true,
+  "sources": [
+    {
+      "provider": "yahoo",
+      "externalId": "390.l.1123131",
+      "role": "full",
+      "groupLabel": "A",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 16,
+      "canonicalWeekOffset": 0,
+      "priority": 10,
+      "enabled": true
+    },
+    {
+      "provider": "yahoo",
+      "externalId": "390.l.1117813",
+      "role": "supplemental",
+      "groupLabel": "B",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 16,
+      "canonicalWeekOffset": 0,
+      "priority": 10,
+      "enabled": true
+    }
+  ],
+  "standingsTiebreakers": ["wins", "ties", "points_for", "display_name"],
+  "outcomes": {
+    "championExternalRosterId": "390.l.1123131.t.1",
+    "lastPlaceExternalRosterId": "390.l.1117813.t.6"
+  },
+  "rosterMappings": {},
+  "corrections": [],
+  "review": {
+    "status": "reviewed",
+    "reviewedBy": "legacy-audit",
+    "reviewedAt": "2026-07-21",
+    "notes": "Merged Groups A and B and final outcomes verified against the immutable legacy SQLite source."
+  }
+}

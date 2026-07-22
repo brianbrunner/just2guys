@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "year": 2024,
+  "slug": "2024",
+  "name": "Just 2 Guys 2024",
+  "status": "complete",
+  "regularSeasonStartWeek": 1,
+  "regularSeasonEndWeek": 14,
+  "playoffStartWeek": 15,
+  "finalWeek": 17,
+  "teamCount": 14,
+  "structure": "single",
+  "visible": true,
+  "sources": [
+    {
+      "provider": "sleeper",
+      "externalId": "1129518571475816448",
+      "role": "full",
+      "sourceWeekStart": 1,
+      "sourceWeekEnd": 17,
+      "canonicalWeekOffset": 0,
+      "priority": 10,
+      "enabled": true
+    }
+  ],
+  "standingsTiebreakers": ["wins", "ties", "points_for", "display_name"],
+  "outcomes": {
+    "championExternalRosterId": "1129518571475816448:4",
+    "lastPlaceExternalRosterId": "1129518571475816448:1"
+  },
+  "rosterMappings": {},
+  "corrections": [],
+  "review": {
+    "status": "reviewed",
+    "reviewedBy": "public-api-reconciliation",
+    "reviewedAt": "2026-07-21",
+    "notes": "Champion is the winner of winners-bracket placement 1; last place is the loser of the maximum-placement consolation match."
+  }
+}
