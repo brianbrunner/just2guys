@@ -10,11 +10,12 @@ describe("production release gates", () => {
       unresolvedAccounts: ["722600873687064576"],
       legacyYahooCredentialRevoked: false,
       legacySleeperCredentialRevoked: false,
+      productionSyncPathConfirmed: false,
       productionUrl: null,
       requireProductionUrl: true,
       activeSeasonConfigured: true,
     });
-    expect(gates.filter((gate) => gate.status === "blocked")).toHaveLength(6);
+    expect(gates.filter((gate) => gate.status === "blocked")).toHaveLength(7);
     expect(gates.find((gate) => gate.id === "active-season")?.status).toBe(
       "pass",
     );
@@ -28,6 +29,7 @@ describe("production release gates", () => {
         unresolvedAccounts: [],
         legacyYahooCredentialRevoked: true,
         legacySleeperCredentialRevoked: true,
+        productionSyncPathConfirmed: true,
         productionUrl: "https://just2guys.example.com",
         requireProductionUrl: true,
         activeSeasonConfigured: true,
@@ -42,6 +44,7 @@ describe("production release gates", () => {
       unresolvedAccounts: [],
       legacyYahooCredentialRevoked: true,
       legacySleeperCredentialRevoked: true,
+      productionSyncPathConfirmed: true,
       productionUrl: null,
       requireProductionUrl: false,
       activeSeasonConfigured: true,

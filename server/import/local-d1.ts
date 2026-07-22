@@ -20,9 +20,7 @@ function miniflareDatabaseFilename(databaseId: string) {
 
 export async function localDatabasePath() {
   const config = await readFile(resolve("wrangler.jsonc"), "utf8");
-  const previewId = config.match(
-    /"preview_database_id"\s*:\s*"([^"]+)"/,
-  )?.[1];
+  const previewId = config.match(/"preview_database_id"\s*:\s*"([^"]+)"/)?.[1];
   if (!previewId)
     throw new Error("wrangler.jsonc must define preview_database_id for D1.");
 

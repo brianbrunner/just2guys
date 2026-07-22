@@ -76,9 +76,17 @@ export class SleeperClient {
         clearTimeout(timeout);
       }
     }
-    throw lastError instanceof SleeperApiError
-      ? lastError
-      : new SleeperApiError(`Sleeper ${path} failed after retries`, "upstream");
+    if (lastError instanceof SleeperApiError) throw lastError;
+    const detail =
+      lastError instanceof DOMException && lastError.name === "AbortError"
+        ? "request timed out"
+        : lastError instanceof Error
+          ? lastError.message
+          : "unknown network error";
+    throw new SleeperApiError(
+      `Sleeper ${path} failed after retries: ${detail}`,
+      "upstream",
+    );
   }
 
   league(leagueId: string) {

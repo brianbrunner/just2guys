@@ -827,13 +827,16 @@ export async function getFreshness(database: D1Database) {
     database
       .prepare(
         `SELECT finished_at, status FROM sync_runs
-         WHERE status IN ('success', 'partial') ORDER BY finished_at DESC LIMIT 1`,
+         WHERE trigger IN ('cron', 'manual')
+           AND status IN ('success', 'partial', 'skipped')
+         ORDER BY finished_at DESC LIMIT 1`,
       )
       .first<{ finished_at: string; status: string }>(),
     database
       .prepare(
         `SELECT status, finished_at, error_summary FROM sync_runs
-         WHERE finished_at IS NOT NULL ORDER BY finished_at DESC LIMIT 10`,
+         WHERE trigger IN ('cron', 'manual') AND finished_at IS NOT NULL
+         ORDER BY finished_at DESC LIMIT 10`,
       )
       .all<{
         status: string;
@@ -841,14 +844,14 @@ export async function getFreshness(database: D1Database) {
         error_summary: string | null;
       }>(),
   ]);
-  if (!row) return null;
   let consecutiveFailures = 0;
   for (const run of recent.results) {
     if (run.status !== "failed") break;
     consecutiveFailures += 1;
   }
   return {
-    ...row,
+    finished_at: row?.finished_at ?? null,
+    status: row?.status ?? null,
     consecutiveFailures,
     lastFailure: recent.results.find((run) => run.status === "failed") ?? null,
   };

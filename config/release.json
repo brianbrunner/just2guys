@@ -2,5 +2,6 @@
   "version": 1,
   "legacyYahooCredentialRevoked": false,
   "legacySleeperCredentialRevoked": false,
+  "productionSyncPathConfirmed": false,
   "productionUrl": "https://just2guys.football"
 }

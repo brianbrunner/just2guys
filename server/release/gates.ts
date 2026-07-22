@@ -10,6 +10,7 @@ export interface ReleaseGateInput {
   unresolvedAccounts: string[];
   legacyYahooCredentialRevoked: boolean;
   legacySleeperCredentialRevoked: boolean;
+  productionSyncPathConfirmed: boolean;
   productionUrl: string | null;
   requireProductionUrl: boolean;
   activeSeasonConfigured: boolean;
@@ -56,6 +57,12 @@ export function evaluateReleaseGates(input: ReleaseGateInput): ReleaseGate[] {
       input.legacySleeperCredentialRevoked,
       "Legacy Sleeper credential revocation is acknowledged.",
       "Revoke the expired legacy Sleeper credential, then acknowledge it in config/release.json.",
+    ),
+    result(
+      "production-sync",
+      input.productionSyncPathConfirmed,
+      "A working production Sleeper sync path is confirmed.",
+      "Confirm Worker egress or enable and verify the GitHub/local D1 sync fallback, then acknowledge it in config/release.json.",
     ),
     result(
       "production-url",

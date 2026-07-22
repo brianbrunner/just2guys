@@ -133,6 +133,20 @@ The Worker cron is configured for every 30 minutes. A scheduled run:
 
 The browser polls the app’s own JSON resource route every 45 seconds only while the page is visible and the season is active. A stale warning appears after 45 minutes without a successful sync, leaving one missed 30-minute run as the operational grace period.
 
+### Sleeper egress fallback
+
+Sleeper currently does not answer requests from the deployed Worker runtime, even though the same public endpoints work from local and GitHub-hosted runners. The Worker Cron remains configured, and `.github/workflows/sync.yml` provides a staggered fallback at minutes 7 and 37. It fetches Sleeper outside Cloudflare and writes the same validated, idempotent changes through [Cloudflare's supported D1 query API](https://developers.cloudflare.com/api/resources/d1/subresources/database/methods/query/).
+
+The fallback is disabled by default and requires a scoped Cloudflare API token with D1 Read and D1 Write permission:
+
+```bash
+gh secret set CLOUDFLARE_ACCOUNT_ID --repo brianbrunner/just2guys
+gh secret set CLOUDFLARE_API_TOKEN --repo brianbrunner/just2guys
+gh variable set REMOTE_SYNC_ENABLED --body true --repo brianbrunner/just2guys
+```
+
+The values are read from prompts and stored as GitHub Actions secrets; never put them in a file or command argument. The database ID and active season remain public configuration in `wrangler.jsonc`. To run the same fallback from a trusted local shell, export the two variables and run `npm run sync:remote`.
+
 ### Test the scheduled handler locally
 
 The Cloudflare Vite development server exposes the Worker scheduled handler on
@@ -178,7 +192,7 @@ The browser suite covers the key public routes, desktop and mobile behavior, rev
    ```
 
 2. Put the returned database ID in `wrangler.jsonc`, replacing `REPLACE_WITH_PRODUCTION_D1_ID`.
-   Record actual legacy-credential revocations in `config/release.json`; never mark those acknowledgements true until the credentials have been revoked at their providers.
+   Record actual legacy-credential revocations in `config/release.json`; never mark those acknowledgements true until the credentials have been revoked at their providers. Likewise, set `productionSyncPathConfirmed` only after either Worker egress or the fallback has completed a production Sleeper sync successfully.
 3. Apply the schema:
 
    ```bash
@@ -222,7 +236,7 @@ The browser suite covers the key public routes, desktop and mobile behavior, rev
    npm run release:verify:production
    ```
 
-No application secrets are required. The Sleeper API is public and read-only.
+The Worker runtime itself requires no application secret; Sleeper is public and read-only. The optional external sync fallback uses a scoped operational D1 token stored only in GitHub Actions or a trusted local environment.
 
 ### Deployment pipeline
 
@@ -237,6 +251,8 @@ The workflow deliberately does not apply schema migrations or bulk imports.
 Those remain explicit operator actions because the database must be exported
 before a production schema or bulk-data change. The Worker deployment applies
 the Cron Trigger declared in `wrangler.jsonc`.
+
+`.github/workflows/sync.yml` is the optional 30-minute Sleeper egress fallback described above. Its job is skipped unless the repository variable `REMOTE_SYNC_ENABLED` is exactly `true`.
 
 ## Backup and recovery
 
@@ -257,4 +273,5 @@ the Cron Trigger declared in `wrangler.jsonc`.
 - The reviewed 2021 and 2022 conference topology and final outcomes are incorporated into canonical career totals.
 - The 16 confirmed Yahoo/Sleeper identities are combined, including owner-confirmed `McTitans = Ashley`. Sleeper-only account `yuzeh` is the distinct manager Dan and has no Yahoo history.
 - Production is deployed at `https://just2guys.brian-brunner-720.workers.dev`; `just2guys.football` is attached as the custom domain and may show stale legacy DNS until existing TTLs expire.
-- The first production Cron reached its scheduled handler but Sleeper's public API request failed from the Worker runtime. The site retains its imported data; use the documented local handler during investigation, and add a GitHub/local push sync only if Cloudflare egress remains blocked.
+- Production Cron reaches the scheduled handler every 30 minutes, but Sleeper's public API currently fails from the Worker runtime. The version-controlled GitHub/local D1 API fallback is ready and remains disabled until its scoped repository secrets and `REMOTE_SYNC_ENABLED` variable are configured.
+- The release gate still requires owner confirmation that the legacy Yahoo consumer secret and expired Sleeper bearer token were revoked. Neither credential is present in this repository; the immutable SQLite migration copy contains zero rows in its legacy `token` table.

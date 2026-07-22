@@ -46,13 +46,17 @@ const health = (await healthResponse.json()) as {
   stale?: boolean;
   degraded?: boolean;
 };
-if (!health.ok || health.stale || health.degraded)
+if (
+  !health.ok ||
+  health.stale ||
+  (health.activeSeason?.status === "in_season" && health.degraded)
+)
   throw new Error(`Production health is not OK: ${JSON.stringify(health)}`);
 if (
   health.activeSeason?.status === "in_season" &&
   !health.lastSuccessfulSync?.finished_at
 )
-  throw new Error("In-season production has no successful scheduled sync");
+  throw new Error("In-season production has no successful operational sync");
 console.log("PASS /health: active season and sync health verified.");
 
 const weekResponse = await response("/api/seasons/2025/weeks/17");

@@ -8,6 +8,9 @@ test("home opens on the current scoreboard without serious accessibility issues"
   await expect(
     page.getByRole("heading", { level: 1, name: "2025 · Week 17" }),
   ).toBeVisible();
+  await expect(page.locator(".freshness")).toContainText(
+    "No successful sync recorded",
+  );
   const results = await new AxeBuilder({ page }).analyze();
   expect(
     results.violations.filter((violation) =>

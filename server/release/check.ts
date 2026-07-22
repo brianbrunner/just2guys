@@ -15,6 +15,7 @@ const releaseSchema = z.object({
   version: z.literal(1),
   legacyYahooCredentialRevoked: z.boolean(),
   legacySleeperCredentialRevoked: z.boolean(),
+  productionSyncPathConfirmed: z.boolean(),
   productionUrl: z.url().nullable(),
 });
 const release = releaseSchema.parse(releaseValues);
@@ -58,6 +59,7 @@ const gates = evaluateReleaseGates({
   unresolvedAccounts,
   legacyYahooCredentialRevoked: release.legacyYahooCredentialRevoked,
   legacySleeperCredentialRevoked: release.legacySleeperCredentialRevoked,
+  productionSyncPathConfirmed: release.productionSyncPathConfirmed,
   productionUrl: release.productionUrl,
   requireProductionUrl: !process.argv.includes("--predeploy"),
   activeSeasonConfigured: Boolean(

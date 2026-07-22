@@ -30,6 +30,9 @@ describe("immutable Yahoo migration source", () => {
     expect(
       database.prepare("SELECT COUNT(*) count FROM matchuprosterslot").get(),
     ).toEqual({ count: 26957 });
+    expect(database.prepare("SELECT COUNT(*) count FROM token").get()).toEqual({
+      count: 0,
+    });
     database.close();
   });
 });

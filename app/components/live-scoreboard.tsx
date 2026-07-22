@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { Scoreboard, type ScoreMatchup } from "./scoreboard";
 
 interface Freshness {
-  finished_at: string;
-  status: string;
+  finished_at: string | null;
+  status: string | null;
   consecutiveFailures?: number;
   lastFailure?: {
     finished_at: string;
@@ -61,9 +61,9 @@ export function LiveScoreboard({
   const [now, setNow] = useState<number | null>(null);
   const stale = Boolean(
     poll &&
-    freshness &&
     now !== null &&
-    now - Date.parse(freshness.finished_at) > staleAfterSeconds * 1000,
+    (!freshness?.finished_at ||
+      now - Date.parse(freshness.finished_at) > staleAfterSeconds * 1000),
   );
 
   useEffect(() => {
@@ -111,7 +111,7 @@ export function LiveScoreboard({
   return (
     <div>
       <div className="freshness" aria-live="polite">
-        {freshness ? (
+        {freshness?.finished_at ? (
           <span>
             Updated{" "}
             <time dateTime={freshness.finished_at}>

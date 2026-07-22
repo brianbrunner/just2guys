@@ -14,13 +14,14 @@ export async function loader({ context }: Route.LoaderArgs) {
       }>(),
   ]);
   const degraded = (freshness?.consecutiveFailures ?? 0) >= 3;
+  const inSeason = season?.status === "in_season";
   const stale = Boolean(
-    season?.status === "in_season" &&
-    freshness &&
-    Date.now() - Date.parse(freshness.finished_at) >
-      Number(env.STALE_AFTER_SECONDS) * 1000,
+    inSeason &&
+    (!freshness?.finished_at ||
+      Date.now() - Date.parse(freshness.finished_at) >
+        Number(env.STALE_AFTER_SECONDS) * 1000),
   );
-  const ok = Boolean(season) && !degraded && !stale;
+  const ok = Boolean(season) && (!inSeason || (!degraded && !stale));
   return Response.json(
     {
       ok,
