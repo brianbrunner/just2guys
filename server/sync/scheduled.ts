@@ -17,12 +17,6 @@ import type {
 import { safeImageUrl } from "../security/image-url";
 import { resolveIdentity } from "../identity/registry";
 
-export interface SyncEnvironment {
-  DB: D1Database;
-  ACTIVE_SEASON: string;
-  STALE_AFTER_SECONDS: string;
-}
-
 async function stableId(prefix: string, value: string) {
   const digest = await crypto.subtle.digest(
     "SHA-256",
@@ -38,12 +32,6 @@ function category(error: unknown) {
   if (error instanceof SleeperApiError) return error.category;
   if (error instanceof Error && /map|roster|identity/i.test(error.message))
     return "mapping";
-  if (
-    error instanceof Error &&
-    (error.name === "D1HttpError" ||
-      /\bD1\b|database|SQLITE/i.test(error.message))
-  )
-    return "database";
   return "application";
 }
 
@@ -128,7 +116,7 @@ function cachedRosters(payloadJson: string | null | undefined) {
 }
 
 async function syncRosterMetadata(input: {
-  env: SyncEnvironment;
+  env: Env;
   client: SleeperClient;
   sourceId: string;
   sourceExternalId: string;
@@ -327,7 +315,7 @@ async function syncRosterMetadata(input: {
 }
 
 export async function syncWeek(input: {
-  env: SyncEnvironment;
+  env: Env;
   client: SleeperClient;
   seasonYear: number;
   source: SeasonManifest["sources"][number];
@@ -587,41 +575,23 @@ export async function syncWeek(input: {
   };
 }
 
-export interface SyncExecutionResult {
-  status: "success" | "skipped" | "failed";
-  runId?: string;
-  changed?: boolean;
-  writes?: number;
-  reason?: string;
-  error?: string;
-}
-
-export async function runScheduledSync(
-  env: SyncEnvironment,
-  scheduledTime = Date.now(),
-  trigger: "cron" | "manual" = "cron",
-): Promise<SyncExecutionResult> {
+export async function runScheduledSync(env: Env, scheduledTime = Date.now()) {
   const startedAt = new Date(scheduledTime);
   const owner = crypto.randomUUID();
   if (!(await acquireLease(env.DB, owner, startedAt))) {
     console.log(
       JSON.stringify({ event: "sync_skipped", reason: "lease_held" }),
     );
-    return { status: "skipped", reason: "lease_held" };
+    return;
   }
   const runId = crypto.randomUUID();
   let client: SleeperClient | undefined;
   try {
     await env.DB.prepare(
       `INSERT INTO sync_runs (id, trigger, season_id, status, started_at)
-       VALUES (?, ?, ?, 'running', ?)`,
+       VALUES (?, 'cron', ?, 'running', ?)`,
     )
-      .bind(
-        runId,
-        trigger,
-        `season-${env.ACTIVE_SEASON}`,
-        startedAt.toISOString(),
-      )
+      .bind(runId, `season-${env.ACTIVE_SEASON}`, startedAt.toISOString())
       .run();
     const manifest = getSeasonManifest(Number(env.ACTIVE_SEASON));
     if (!manifest)
@@ -643,11 +613,7 @@ export async function runScheduledSync(
           runId,
         )
         .run();
-      return {
-        status: "skipped",
-        runId,
-        reason: "pre_draft_or_out_of_season",
-      };
+      return;
     }
     const canonicalWeek = Math.min(nfl.week, manifest.finalWeek);
     const sources = sourcesForCanonicalWeek(manifest, canonicalWeek);
@@ -694,7 +660,6 @@ export async function runScheduledSync(
     console.log(
       JSON.stringify({ event: "sync_complete", runId, changed, writes }),
     );
-    return { status: changed ? "success" : "skipped", runId, changed, writes };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     await env.DB.prepare(
@@ -716,7 +681,6 @@ export async function runScheduledSync(
         message,
       }),
     );
-    return { status: "failed", runId, error: message };
   } finally {
     await releaseLease(env.DB, owner);
   }

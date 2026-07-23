@@ -76,6 +76,23 @@ describe("Sleeper boundary adapter", () => {
     );
   });
 
+  it("invokes fetch with the runtime global as its receiver", async () => {
+    const fetcher = function (this: unknown) {
+      expect(this).toBe(globalThis);
+      return Promise.resolve(
+        Response.json({
+          week: 0,
+          season: "2026",
+          season_type: "pre",
+        }),
+      );
+    } as typeof fetch;
+
+    await expect(new SleeperClient(fetcher).nflState()).resolves.toMatchObject({
+      season: "2026",
+    });
+  });
+
   it("retries a transient upstream failure and validates the recovery payload", async () => {
     let attempts = 0;
     const fetcher: typeof fetch = () => {

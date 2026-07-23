@@ -24,10 +24,16 @@ export class SleeperApiError extends Error {
 export class SleeperClient {
   requestCount = 0;
 
+  private readonly fetcher: typeof fetch;
+
   constructor(
-    private readonly fetcher: typeof fetch = fetch,
+    fetcher: typeof fetch = fetch,
     private readonly baseUrl = "https://api.sleeper.app/v1",
-  ) {}
+  ) {
+    // Cloudflare's global fetch validates its receiver. Storing it directly as
+    // an instance property would invoke it with SleeperClient as `this`.
+    this.fetcher = fetcher.bind(globalThis);
+  }
 
   private async request<T>(path: string, schema: z.ZodType<T>): Promise<T> {
     let lastError: unknown;

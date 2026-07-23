@@ -1,7 +1,7 @@
 # Just 2 Guys — Product and Technical Specification
 
 Status: Implemented and deployed; external launch gates remain
-Last updated: 2026-07-21  
+Last updated: 2026-07-22
 Intended audience: Future maintainers and coding agents  
 Implementation status: Core application deployed and verified; see production status and release gates below
 
@@ -470,8 +470,6 @@ The scheduled handler must:
 
 The handler must be idempotent and recover on the next run after a partial upstream or D1 failure.
 
-If Sleeper does not answer from Cloudflare's Worker egress, the same validated sync may run from a GitHub-hosted or trusted local Node process and write through Cloudflare's authenticated D1 query API. This is an operational fallback, not a second source of business rules: it must call the same sync implementation, use the same D1 lease, remain disabled until scoped credentials are configured, and never store those credentials in the repository.
-
 Do not blindly rewrite every player row every 30 minutes. Use hashes and separate refresh cadences:
 
 - Live matchup scores: every 30 minutes when relevant.
@@ -802,14 +800,14 @@ Completed locally:
 - Reviewed 2023 Week 14 correction selecting populated platform scores over the source's anomalous all-zero `custom_points` values; canonical and remote-import validation require zero finalized ties.
 - Sleeper postseason brackets are reduced to owner-approved meaningful paths: championship progression, the five-game inverse-bye last-place path, and the final third-place game. Six noncompetitive placement games per single-league 2023–2025 season remain auditable but are excluded from every page and statistic.
 - Local D1 seeded with 14 seasons, 210 canonical teams, 23 canonical people, 1,072 players, 1,668 matchups, and 45,853 lineup entries; canonical validation and foreign-key checks pass.
-- Strict typecheck, lint, 71 unit/integration tests, production build, and 20 Playwright browser tests pass. Browser coverage stays focused on desktop/mobile behavior, Axe accessibility checks, keyboard navigation, sortable tables, week-to-week score replacement, required routes/JSON resources, live polling/failure retention/hidden-tab behavior, zero-ties enforcement, review gates, search, and overflow.
+- Strict typecheck, lint, 69 unit/integration tests, production build, and 20 Playwright browser tests pass. Browser coverage stays focused on desktop/mobile behavior, Axe accessibility checks, keyboard navigation, sortable tables, week-to-week score replacement, required routes/JSON resources, live polling/failure retention/hidden-tab behavior, zero-ties enforcement, review gates, search, and overflow.
 - The two large historical SQL imports are split into 244 ordered, checksummed, restart-safe D1 chunks containing 97,035 statements. CI rehearses every chunk against a clean database and requires canonical counts, integrity, foreign keys, and zero finalized ties before production import is permitted.
 - A production release checker blocks deployment while historical reviews, participating identities, D1 configuration, credential-revocation acknowledgements, or a confirmed production sync path remain incomplete. Post-deployment verification requires HTTPS SSR content, healthy status, seeded JSON/ETag behavior, and an in-season successful operational sync.
 
 Production status:
 
-- Production D1, Worker, 30-minute Cron Trigger, Workers.dev preview, and the `just2guys.football` custom domain are configured. The imported production dataset passes counts, foreign keys, zero-ties, and HTTPS Workers.dev smoke checks; the apex may temporarily resolve to stale legacy DNS while TTLs expire.
-- Production Cron fires every 30 minutes, but Sleeper's public endpoint does not answer from the Worker runtime. A staggered GitHub/local fallback now calls the same sync implementation and writes through Cloudflare's supported D1 API; it remains disabled until a scoped D1 token and repository enablement variable are configured.
+- Production D1, Worker, 30-minute Cron Trigger, Workers.dev preview, and the `just2guys.football` custom domain are configured. The imported production dataset passes counts, foreign keys, zero-ties, and HTTPS smoke checks on both production hosts.
+- Production Cron reaches and validates Sleeper successfully. A pre-draft production run completed after one public NFL-state request with no data writes, proving the deployed network and runtime path before in-season synchronization begins.
 - Revoking the credentials found in the legacy repository remains an owner action; neither credential is copied, required, or stored by this application.
 
 ## 19. Delivery phases

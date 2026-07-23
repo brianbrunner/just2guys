@@ -8,7 +8,6 @@
     "drizzle.config.ts",
     "eslint.config.js",
     "server/import/**/*",
-    "server/db/**/*",
     "server/identity/**/*",
     "server/domain/dataset.ts",
     "server/domain/elo.ts",

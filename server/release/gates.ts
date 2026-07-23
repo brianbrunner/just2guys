@@ -62,7 +62,7 @@ export function evaluateReleaseGates(input: ReleaseGateInput): ReleaseGate[] {
       "production-sync",
       input.productionSyncPathConfirmed,
       "A working production Sleeper sync path is confirmed.",
-      "Confirm Worker egress or enable and verify the GitHub/local D1 sync fallback, then acknowledge it in config/release.json.",
+      "Verify a production Worker Cron can reach Sleeper, then acknowledge it in config/release.json.",
     ),
     result(
       "production-url",
