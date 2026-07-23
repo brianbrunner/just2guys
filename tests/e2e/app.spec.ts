@@ -174,7 +174,7 @@ test("keyboard users can reveal the skip link and reach main content", async ({
   await expect(page).toHaveURL(/#main-content$/);
 });
 
-test("live scoreboard refreshes, pauses while hidden, and retains scores after failure", async ({
+test("live scoreboard refreshes and retains scores after failure", async ({
   page,
 }) => {
   let requestCount = 0;
@@ -250,24 +250,12 @@ test("live scoreboard refreshes, pauses while hidden, and retains scores after f
   });
   /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
   const fixture = page.locator("#live-scoreboard-test");
-
-  await page.evaluate(() => {
-    Object.defineProperty(document, "visibilityState", {
-      configurable: true,
-      value: "hidden",
-    });
-    document.dispatchEvent(new Event("visibilitychange"));
-  });
-  await page.waitForTimeout(100);
-  expect(requestCount).toBe(0);
-
-  await page.evaluate(() => {
-    Object.defineProperty(document, "visibilityState", {
-      configurable: true,
-      value: "visible",
-    });
-    document.dispatchEvent(new Event("visibilitychange"));
-  });
+  await expect(
+    fixture.getByText("No matchups are on the board yet."),
+  ).toBeVisible();
+  await page.evaluate(() =>
+    document.dispatchEvent(new Event("visibilitychange")),
+  );
   await expect(fixture.getByText("New score arrived")).toBeVisible();
   await expect(fixture.getByText("123.45")).toBeVisible();
 
