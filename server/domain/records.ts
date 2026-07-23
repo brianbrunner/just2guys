@@ -1,4 +1,7 @@
 import type { DomainDataset, DomainManager, DomainSide } from "./dataset";
+import { calculateAllPlayStandings } from "./all-play";
+import { calculateManagerElo, ELO_INITIAL_RATING } from "./elo";
+import { calculateStandings } from "./standings";
 
 export interface RecordDefinition {
   slug: string;
@@ -19,6 +22,8 @@ export interface RecordEntry {
   valueLabel: string;
   href?: string;
   secondaryHref?: string;
+  year?: number;
+  phase?: string;
 }
 
 function defineRecord(
@@ -140,6 +145,88 @@ export const recordDefinitions: RecordDefinition[] = [
     name: "Best Regular Season",
     description: "Most regular-season wins by a season team.",
     eligibility: "Regular-season games only.",
+    direction: "desc",
+    supportsPhase: false,
+  }),
+  defineRecord({
+    slug: "getting-away-with-it",
+    name: "Getting Away With It",
+    description: "Lowest team scores that still won.",
+    eligibility: "Final two-team wins only.",
+    direction: "asc",
+  }),
+  defineRecord({
+    slug: "cursed",
+    name: "Cursed",
+    description: "Highest team scores that still lost.",
+    eligibility: "Final two-team losses only.",
+    direction: "desc",
+  }),
+  defineRecord({
+    slug: "heater",
+    name: "Heater",
+    description: "Longest manager winning streaks.",
+    eligibility:
+      "Final decisions in chronological order; streaks cross seasons.",
+    direction: "desc",
+    supportsPhase: false,
+  }),
+  defineRecord({
+    slug: "the-darkness",
+    name: "The Darkness",
+    description: "Longest manager losing streaks.",
+    eligibility:
+      "Final decisions in chronological order; streaks cross seasons.",
+    direction: "desc",
+    supportsPhase: false,
+  }),
+  defineRecord({
+    slug: "giant-killer",
+    name: "Giant Killer",
+    description: "Largest victories by a pregame Elo underdog.",
+    eligibility: "Winner entered the game with a lower manager Elo.",
+    direction: "desc",
+  }),
+  defineRecord({
+    slug: "schedule-merchant",
+    name: "Schedule Merchant",
+    description: "Most wins gained from the weekly schedule.",
+    eligibility:
+      "Regular season; actual wins compared with all-play expected wins.",
+    direction: "desc",
+    supportsPhase: false,
+  }),
+  defineRecord({
+    slug: "schedule-from-hell",
+    name: "Schedule From Hell",
+    description: "Most wins lost to the weekly schedule.",
+    eligibility:
+      "Regular season; actual wins compared with all-play expected wins.",
+    direction: "asc",
+    supportsPhase: false,
+  }),
+  defineRecord({
+    slug: "playoff-mode",
+    name: "Playoff Mode",
+    description: "Largest scoring jump from regular season to postseason.",
+    eligibility: "At least two meaningful postseason games.",
+    direction: "desc",
+    supportsPhase: false,
+  }),
+  defineRecord({
+    slug: "cinderella-run",
+    name: "Cinderella Run",
+    description: "Lowest regular-season seed to win the championship.",
+    eligibility:
+      "Reviewed champions with a reconstructable regular-season seed.",
+    direction: "desc",
+    supportsPhase: false,
+  }),
+  defineRecord({
+    slug: "roller-coaster",
+    name: "Roller Coaster",
+    description: "Most volatile regular-season scoring.",
+    eligibility: "At least 10 games; ranked by score standard deviation.",
     direction: "desc",
     supportsPhase: false,
   }),
@@ -497,6 +584,273 @@ export function calculateRecord(
             href: `/rivalries/${item.owner.slug}/${item.opponent.slug}`,
           };
         }),
+      "desc",
+    );
+  }
+  if (slug === "getting-away-with-it" || slug === "cursed") {
+    const targetOutcome = slug === "getting-away-with-it" ? "win" : "loss";
+    return withRanks(
+      pairs.flatMap((pair) => {
+        const side = pair.find(
+          (candidate) => candidate.outcome === targetOutcome,
+        );
+        const opponent = pair.find((candidate) => candidate !== side);
+        if (!side || !opponent) return [];
+        return [
+          {
+            label: `${side.teamName} ${targetOutcome === "win" ? "beat" : "lost to"} ${opponent.teamName}`,
+            detail: `${side.year} · Week ${side.week} · ${side.managers
+              .map((manager) => manager.name)
+              .join(" & ")}`,
+            value: side.points,
+            valueLabel: side.points.toFixed(2),
+            href: `/matchups/${side.matchupId}`,
+          },
+        ];
+      }),
+      definition.direction,
+    );
+  }
+  if (slug === "heater" || slug === "the-darkness") {
+    const targetOutcome = slug === "heater" ? "win" : "loss";
+    const games = [...dataset.sides].sort(
+      (left, right) =>
+        left.year - right.year ||
+        left.week - right.week ||
+        left.matchupId.localeCompare(right.matchupId),
+    );
+    const streaks = new Map<
+      string,
+      {
+        manager: DomainManager;
+        current: number;
+        currentStart: DomainSide | null;
+        best: number;
+        bestStart: DomainSide | null;
+        bestEnd: DomainSide | null;
+      }
+    >();
+    for (const side of games) {
+      for (const manager of side.managers) {
+        const item = streaks.get(manager.id) ?? {
+          manager,
+          current: 0,
+          currentStart: null,
+          best: 0,
+          bestStart: null,
+          bestEnd: null,
+        };
+        if (side.outcome === targetOutcome) {
+          if (item.current === 0) item.currentStart = side;
+          item.current += 1;
+          if (item.current > item.best) {
+            item.best = item.current;
+            item.bestStart = item.currentStart;
+            item.bestEnd = side;
+          }
+        } else {
+          item.current = 0;
+          item.currentStart = null;
+        }
+        streaks.set(manager.id, item);
+      }
+    }
+    return withRanks(
+      [...streaks.values()]
+        .filter(
+          (item) => item.best > 0 && item.bestStart !== null && item.bestEnd,
+        )
+        .map((item) => ({
+          label: item.manager.name,
+          detail: `${item.bestStart?.year} W${item.bestStart?.week} → ${item.bestEnd?.year} W${item.bestEnd?.week}`,
+          value: item.best,
+          valueLabel: `${item.best} games`,
+          href: managerHref(item.manager),
+        })),
+      "desc",
+    );
+  }
+  if (slug === "giant-killer") {
+    const ratings = calculateManagerElo(dataset.sides);
+    const pregameRatings = new Map<string, number>();
+    for (const [managerId, rating] of ratings) {
+      for (const point of rating.history) {
+        pregameRatings.set(
+          `${managerId}:${point.matchupId}`,
+          point.rating - point.delta,
+        );
+      }
+    }
+    const enteringRating = (side: DomainSide) =>
+      side.managers.reduce(
+        (total, manager) =>
+          total +
+          (pregameRatings.get(`${manager.id}:${side.matchupId}`) ??
+            ELO_INITIAL_RATING),
+        0,
+      ) / side.managers.length;
+    return withRanks(
+      pairs.flatMap((pair) => {
+        const winner = pair.find((side) => side.outcome === "win");
+        const loser = pair.find((side) => side.outcome === "loss");
+        if (!winner || !loser) return [];
+        const difference = enteringRating(loser) - enteringRating(winner);
+        if (difference <= 0) return [];
+        return [
+          {
+            label: `${winner.teamName} over ${loser.teamName}`,
+            detail: `${winner.year} · Week ${winner.week} · ${winner.managers
+              .map((manager) => manager.name)
+              .join(" & ")}`,
+            value: Math.round(difference * 100) / 100,
+            valueLabel: `${Math.round(difference)} Elo`,
+            href: `/matchups/${winner.matchupId}`,
+            year: winner.year,
+            phase: winner.phase,
+          },
+        ];
+      }),
+      "desc",
+    );
+  }
+  if (slug === "schedule-merchant" || slug === "schedule-from-hell") {
+    const rows = dataset.seasons.flatMap((season) =>
+      calculateAllPlayStandings(
+        dataset.teams.filter((team) => team.year === season.year),
+        dataset.sides.filter((side) => side.year === season.year),
+      )
+        .filter((row) => row.actualGames > 0)
+        .map((row) => ({
+          label: row.teamName,
+          detail: `${season.year} · ${row.managerNames.join(" & ")} · ${row.actualWins}–${row.actualLosses} actual`,
+          value: row.luckDelta,
+          valueLabel: `${row.luckDelta >= 0 ? "+" : ""}${row.luckDelta.toFixed(2)} wins`,
+          href: `/history/all-play?year=${season.year}`,
+        })),
+    );
+    return withRanks(rows, definition.direction);
+  }
+  if (slug === "playoff-mode") {
+    const scoring = new Map<
+      string,
+      {
+        team: DomainDataset["teams"][number];
+        regularPoints: number;
+        regularGames: number;
+        postseasonPoints: number;
+        postseasonGames: number;
+      }
+    >();
+    const teams = new Map(dataset.teams.map((team) => [team.id, team]));
+    for (const side of dataset.sides) {
+      const team = teams.get(side.teamId);
+      if (!team) continue;
+      const item = scoring.get(team.id) ?? {
+        team,
+        regularPoints: 0,
+        regularGames: 0,
+        postseasonPoints: 0,
+        postseasonGames: 0,
+      };
+      if (side.phase === "regular") {
+        item.regularPoints += side.points;
+        item.regularGames += 1;
+      } else {
+        item.postseasonPoints += side.points;
+        item.postseasonGames += 1;
+      }
+      scoring.set(team.id, item);
+    }
+    return withRanks(
+      [...scoring.values()]
+        .filter((item) => item.regularGames > 0 && item.postseasonGames >= 2)
+        .map((item) => {
+          const regular = item.regularPoints / item.regularGames;
+          const postseason = item.postseasonPoints / item.postseasonGames;
+          const difference = Math.round((postseason - regular) * 100) / 100;
+          return {
+            label: item.team.name,
+            detail: `${item.team.year} · ${item.team.managers
+              .map((manager) => manager.name)
+              .join(
+                " & ",
+              )} · ${regular.toFixed(2)} → ${postseason.toFixed(2)} PPG`,
+            value: difference,
+            valueLabel: `${difference >= 0 ? "+" : ""}${difference.toFixed(2)} PPG`,
+            href: `/seasons/${item.team.year}`,
+          };
+        }),
+      "desc",
+    );
+  }
+  if (slug === "cinderella-run") {
+    return withRanks(
+      dataset.teams
+        .filter((team) => team.finalPlace === 1)
+        .flatMap((champion) => {
+          const groupTeams = dataset.teams.filter(
+            (team) =>
+              team.year === champion.year &&
+              (champion.groupLabel === null ||
+                team.groupLabel === champion.groupLabel),
+          );
+          const standing = calculateStandings(
+            groupTeams,
+            dataset.sides.filter(
+              (side) =>
+                side.year === champion.year &&
+                groupTeams.some((team) => team.id === side.teamId),
+            ),
+          ).find((row) => row.teamId === champion.id);
+          if (!standing) return [];
+          return [
+            {
+              label: champion.name,
+              detail: `${champion.year} · ${champion.managers
+                .map((manager) => manager.name)
+                .join(
+                  " & ",
+                )}${champion.groupLabel ? ` · ${champion.groupLabel}` : ""}`,
+              value: standing.rank,
+              valueLabel: `No. ${standing.rank} seed`,
+              href: `/seasons/${champion.year}`,
+            },
+          ];
+        }),
+      "desc",
+    );
+  }
+  if (slug === "roller-coaster") {
+    const scores = new Map<string, number[]>();
+    for (const side of dataset.sides.filter(
+      (candidate) => candidate.phase === "regular",
+    )) {
+      const values = scores.get(side.teamId) ?? [];
+      values.push(side.points);
+      scores.set(side.teamId, values);
+    }
+    return withRanks(
+      dataset.teams.flatMap((team) => {
+        const values = scores.get(team.id) ?? [];
+        if (values.length < 10) return [];
+        const average =
+          values.reduce((total, value) => total + value, 0) / values.length;
+        const variance =
+          values.reduce((total, value) => total + (value - average) ** 2, 0) /
+          values.length;
+        const deviation = Math.round(Math.sqrt(variance) * 100) / 100;
+        return [
+          {
+            label: team.name,
+            detail: `${team.year} · ${team.managers
+              .map((manager) => manager.name)
+              .join(" & ")} · ${average.toFixed(2)} PPG`,
+            value: deviation,
+            valueLabel: `${deviation.toFixed(2)} SD`,
+            href: `/seasons/${team.year}`,
+          },
+        ];
+      }),
       "desc",
     );
   }

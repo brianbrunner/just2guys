@@ -15,13 +15,18 @@ interface LegacySeasonReport {
   scoreLineupDiscrepancies: unknown[];
 }
 
-const migration = readFileSync(
-  new URL(
-    "../server/db/migrations/0000_friendly_tyger_tiger.sql",
-    import.meta.url,
-  ),
-  "utf8",
-).replaceAll("--> statement-breakpoint", "");
+const migration = [
+  "0000_friendly_tyger_tiger.sql",
+  "0001_historical_archive.sql",
+]
+  .map((name) =>
+    readFileSync(
+      new URL(`../server/db/migrations/${name}`, import.meta.url),
+      "utf8",
+    ),
+  )
+  .join("\n")
+  .replaceAll("--> statement-breakpoint", "");
 const legacySql = readFileSync(
   new URL("../generated/legacy-import/legacy-import.sql", import.meta.url),
   "utf8",
@@ -257,6 +262,23 @@ describe.sequential("canonical import", () => {
         outcome: "win",
       },
     ]);
+  });
+
+  it("imports the frozen Sleeper-era drafts and transactions", () => {
+    expect(
+      database
+        .prepare(
+          `SELECT COUNT(*) drafts,
+                  (SELECT COUNT(*) FROM draft_picks) picks,
+                  (SELECT COUNT(*) FROM league_transactions) transactions
+           FROM drafts`,
+        )
+        .get(),
+    ).toEqual({
+      drafts: 8,
+      picks: 1068,
+      transactions: 2734,
+    });
   });
 
   it("preserves Sleeper reserve-list appearances as IR", () => {

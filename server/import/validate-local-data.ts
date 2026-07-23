@@ -81,6 +81,27 @@ const tiedGames = database
        AND SUM(CASE WHEN mt.outcome='tie' THEN 1 ELSE 0 END) > 0`,
   )
   .all();
+const invalidHistoricalFacts = database
+  .prepare(
+    `SELECT 'draft_pick_without_team' issue, dp.id
+     FROM draft_picks dp WHERE dp.season_team_id IS NULL
+     UNION ALL
+     SELECT 'transaction_item_without_team', ti.id
+     FROM transaction_items ti WHERE ti.season_team_id IS NULL
+     UNION ALL
+     SELECT 'completed_draft_without_picks', d.id
+     FROM drafts d
+     WHERE d.status='complete'
+       AND NOT EXISTS (SELECT 1 FROM draft_picks dp WHERE dp.draft_id=d.id)
+     UNION ALL
+     SELECT 'completed_transaction_without_items', lt.id
+     FROM league_transactions lt
+     WHERE lt.status='complete'
+       AND NOT EXISTS (
+         SELECT 1 FROM transaction_items ti WHERE ti.transaction_id=lt.id
+       )`,
+  )
+  .all();
 const counts = database
   .prepare(
     `SELECT
@@ -89,7 +110,10 @@ const counts = database
       (SELECT COUNT(*) FROM people) people,
       (SELECT COUNT(*) FROM players) players,
       (SELECT COUNT(*) FROM matchups) matchups,
-      (SELECT COUNT(*) FROM lineup_entries) lineups`,
+      (SELECT COUNT(*) FROM lineup_entries) lineups,
+      (SELECT COUNT(*) FROM drafts) drafts,
+      (SELECT COUNT(*) FROM draft_picks) draftPicks,
+      (SELECT COUNT(*) FROM league_transactions) transactions`,
   )
   .get();
 database.close();
@@ -103,6 +127,7 @@ const checks = {
   invalidOutcomes,
   invalidSides,
   tiedGames,
+  invalidHistoricalFacts,
 };
 const issueCount = Object.values(checks).reduce(
   (total, rows) => total + rows.length,

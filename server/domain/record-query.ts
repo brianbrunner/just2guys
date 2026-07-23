@@ -50,7 +50,20 @@ export async function getRecordEntries(
   }
 
   const dataset = await loadDomainDataset(database);
-  const entries = calculateRecord(filterRecordDataset(dataset, filters), slug);
+  const entries =
+    slug === "giant-killer"
+      ? calculateRecord(dataset, slug).filter(
+          (entry) =>
+            (filters.fromYear === undefined ||
+              (entry.year ?? 0) >= filters.fromYear) &&
+            (filters.toYear === undefined ||
+              (entry.year ?? 0) <= filters.toYear) &&
+            (!filters.phase ||
+              (filters.phase === "postseason"
+                ? entry.phase !== "regular"
+                : entry.phase === filters.phase)),
+        )
+      : calculateRecord(filterRecordDataset(dataset, filters), slug);
   if (!hasFilters(filters)) {
     try {
       await database

@@ -44,11 +44,18 @@ await writeFile(
   "utf8",
 );
 const referencedPlayerIds = new Set(
-  input.snapshots.flatMap((snapshot) =>
-    snapshot.weeks.flatMap((week) =>
+  input.snapshots.flatMap((snapshot) => [
+    ...snapshot.weeks.flatMap((week) =>
       week.matchups.flatMap((matchup) => matchup.players),
     ),
-  ),
+    ...(snapshot.drafts ?? []).flatMap((draft) =>
+      draft.picks.map((pick) => pick.player_id),
+    ),
+    ...(snapshot.transactions ?? []).flatMap((transaction) => [
+      ...Object.keys(transaction.adds),
+      ...Object.keys(transaction.drops),
+    ]),
+  ]),
 );
 await writeSleeperReconciliation({
   outputDirectory: dirname(outputPath),

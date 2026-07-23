@@ -28,6 +28,7 @@
     "db:import:remote": "node --import tsx server/import/apply-remote-import.ts",
     "import:legacy": "node --import tsx server/import/legacy.ts",
     "backfill:sleeper": "node --import tsx server/import/sleeper-backfill.ts",
+    "backfill:sleeper:history": "node --import tsx server/import/sleeper-history-backfill.ts",
     "import:sleeper:snapshot": "node --import tsx server/import/sleeper-from-snapshot.ts",
     "manifests:validate": "node --import tsx server/import/validate-manifests.ts",
     "data:validate": "node --import tsx server/import/validate-local-data.ts",

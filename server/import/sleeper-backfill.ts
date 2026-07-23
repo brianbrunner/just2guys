@@ -66,6 +66,40 @@ async function main() {
             }),
           )
         : [];
+      const drafts =
+        source.enabled && source.role === "full"
+          ? await inBatches(
+              await client.drafts(source.externalId),
+              3,
+              async (draft) => ({
+                draft,
+                picks: await client.draftPicks(draft.draft_id),
+              }),
+            )
+          : [];
+      const transactions =
+        source.enabled && source.role === "full"
+          ? [
+              ...new Map(
+                (
+                  await inBatches(
+                    Array.from(
+                      { length: manifest.finalWeek + 1 },
+                      (_, week) => week,
+                    ),
+                    4,
+                    async (week) =>
+                      client.transactions(source.externalId, week),
+                  )
+                )
+                  .flat()
+                  .map((transaction) => [
+                    transaction.transaction_id,
+                    transaction,
+                  ]),
+              ).values(),
+            ]
+          : [];
       const snapshot = {
         year: manifest.year,
         configured: source,
@@ -75,6 +109,8 @@ async function main() {
         winnersBracket,
         losersBracket,
         weeks,
+        drafts,
+        transactions,
       };
       return { ...snapshot, contentHash: await contentHash(snapshot) };
     },
@@ -87,6 +123,15 @@ async function main() {
         for (const playerId of matchup.players)
           referencedPlayerIds.add(playerId);
       }
+    }
+    for (const draft of snapshot.drafts) {
+      for (const pick of draft.picks) referencedPlayerIds.add(pick.player_id);
+    }
+    for (const transaction of snapshot.transactions) {
+      for (const playerId of Object.keys(transaction.adds))
+        referencedPlayerIds.add(playerId);
+      for (const playerId of Object.keys(transaction.drops))
+        referencedPlayerIds.add(playerId);
     }
   }
   const directory = await client.players();

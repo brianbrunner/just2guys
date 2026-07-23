@@ -1,6 +1,6 @@
 # Just 2 Guys — Product and Technical Specification
 
-Status: Implemented and deployed; external launch gates remain
+Status: Implemented and deployed
 Last updated: 2026-07-22
 Intended audience: Future maintainers and coding agents  
 Implementation status: Core application deployed and verified; see production status and release gates below
@@ -27,6 +27,7 @@ The product must:
 - Backfill and continually update Sleeper seasons.
 - Represent unusual season topology explicitly instead of burying it in procedural code.
 - Present historical standings, teams, matchups, lineups, managers, rivalries, players, championships, and novelty records.
+- Present alternate all-play standings, an editorial league timeline, every historical team name, and Sleeper-era draft and transaction history.
 - Provide score updates within a few minutes during the active season.
 - Be enjoyable and polished on desktop and mobile.
 
@@ -60,7 +61,8 @@ The initial product will not:
 - Carry forward generated HTML files.
 - Preserve legacy database primary keys as public identifiers.
 - Preserve every unused player imported from Sleeper.
-- Implement drafts, trades, waiver history, chat history, or league financials unless added in a later specification.
+- Reconstruct Yahoo-era drafts or transactions; the preserved Yahoo SQLite source does not contain those facts.
+- Implement chat history or league financials.
 - Attempt second-by-second live scoring.
 - Introduce a CMS before there is a demonstrated editing need.
 
@@ -353,7 +355,26 @@ Required fields include:
 
 Roster slot handling must support modern Sleeper values such as `FLEX` and `SUPER_FLEX`, not only the old Yahoo slot vocabulary.
 
-### 8.8 Raw payload and synchronization metadata
+### 8.8 Drafts and transactions
+
+Sleeper-era historical activity is imported from the public REST API and frozen with the other backfill inputs.
+
+Required entities:
+
+- `drafts` identifies a provider draft, its source league, status, format, rounds, teams, and timestamps.
+- `draft_picks` records pick number, round, slot, player, canonical season team, selecting account when resolvable, and keeper state.
+- `league_transactions` records the provider transaction, source league, type, status, week, creator when resolvable, and provider timestamps.
+- `transaction_rosters` associates every participating canonical team with a transaction.
+- `transaction_items` records added and dropped players and the affected team.
+
+Coverage and display rules:
+
+- Draft and transaction history begins in 2021. Do not imply Yahoo-era coverage.
+- Import all returned transaction statuses for auditability, but the public transaction wire shows completed moves by default.
+- Players referenced only by a draft or transaction are eligible for canonical player creation.
+- The historical snapshot workflow must remain idempotent and use no authentication, cookies, or private endpoints.
+
+### 8.9 Raw payload and synchronization metadata
 
 The system must retain enough provenance to explain or safely repeat imports without turning D1 into an unbounded payload archive.
 
@@ -529,7 +550,20 @@ The replacement must include equivalents of all current record pages:
 
 Each record should support a stable slug and may support filters for season range, regular/postseason phase, and provider era.
 
-### 11.3 Standings
+### 11.3 Additional historical records
+
+16. Getting Away With It — lowest team scores in a final victory.
+17. Cursed — highest team scores in a final loss.
+18. Heater — longest manager winning streak; chronological streaks may cross season boundaries.
+19. The Darkness — longest manager losing streak under the same chronology.
+20. Giant Killer — largest positive difference between the losing favorite’s and winning underdog’s full-archive pregame Elo.
+21. Schedule Merchant — largest positive actual-wins-minus-all-play-expected-wins season.
+22. Schedule From Hell — most negative value of the same schedule-luck measure.
+23. Playoff Mode — largest postseason scoring average increase over the same team’s regular-season average, requiring at least two meaningful postseason games.
+24. Cinderella Run — lowest regular-season seed to become canonical champion; grouped seasons use the champion’s conference seed.
+25. Roller Coaster — largest population standard deviation of regular-season team scores with at least 10 games.
+
+### 11.4 Standings
 
 Default regular-season standings order:
 
@@ -541,7 +575,7 @@ Default regular-season standings order:
 
 Because historical leagues may have used different official tiebreakers, the season manifest may override this ordering. The UI should label reconstructed standings when official seed data is unavailable.
 
-### 11.4 Rivalries
+### 11.5 Rivalries
 
 Rivalry calculations must include:
 
@@ -557,7 +591,7 @@ Rivalry calculations must include:
 
 Projection-based upset counts should be shown only for games where both teams have valid projection data.
 
-### 11.5 Manager Elo
+### 11.6 Manager Elo
 
 - Manager quality is summarized with a transparent Elo rating replayed from the beginning of the canonical archive in year/week order.
 - Every manager begins at 1500. The expected result uses the standard 400-point Elo scale and each game uses K-factor 20.
@@ -583,6 +617,11 @@ Suggested routes:
 - `/players/:id` — player history.
 - `/records` — record explorer.
 - `/records/:slug` — individual record leaderboard.
+- `/history` — editorial league timeline and historical feature index.
+- `/history/all-play` — alternate regular-season standings.
+- `/history/drafts` — Sleeper-era draft boards.
+- `/history/transactions` — completed Sleeper-era roster moves.
+- `/history/team-names` — manager-by-manager team-name museum.
 - `/about` — league/site explanation and data methodology.
 
 IDs and slugs should be stable within the new application. They do not need to match legacy IDs.
@@ -673,6 +712,15 @@ Include:
 - Manager/team history.
 - Best and worst relevant performances.
 - Record appearances.
+
+### 13.8 Historical archive
+
+- The timeline includes every canonical season, source platform, format, champion, last-place manager, and concise format milestones.
+- All-play standings compare each team’s regular-season score with every other score from the same canonical week, including across conferences in grouped seasons.
+- All-play expected wins apply that all-play percentage to the team’s actual game count. Schedule luck is actual wins minus expected wins; comparison ties count as half a win.
+- Draft boards provide season selection, separate conference drafts, sortable picks, player links, and canonical manager/team attribution.
+- Transaction history provides season and type filters, pagination, participating teams, and normalized player additions and drops. Failed claims remain auditable in the database but are not mixed into the default public history.
+- The team-name museum groups every canonical historical team name by manager and preserves its seasons and available historical image.
 
 ## 14. Visual and interaction direction
 
@@ -767,7 +815,7 @@ The public UI should display stale data gracefully even when upstream Sleeper or
 - Playoff qualification versus consolation participation.
 - Championship and last-place derivation.
 - Co-manager attribution.
-- All 15 preserved record definitions.
+- All 25 record definitions: the 15 preserved records plus Getting Away With It, Cursed, Heater, The Darkness, Giant Killer, Schedule Merchant, Schedule From Hell, Playoff Mode, Cinderella Run, and Roller Coaster.
 - Correct `Nice` scoring attribution.
 - Rivalry chronological ordering.
 - Bench and starter classification across Yahoo and Sleeper slot vocabularies.
@@ -787,21 +835,23 @@ The public UI should display stale data gracefully even when upstream Sleeper or
 Completed locally:
 
 - React Router 8/React 19 Cloudflare Worker application with custom responsive design.
-- Eighteen-table Drizzle/D1 schema and initial SQL migration.
+- Twenty-three-table Drizzle/D1 schema with versioned SQL migrations.
 - Validated season manifests for 2013–2026.
 - Immutable, checksum-enforced Yahoo import for 2013–2020 with zero unexplained score discrepancies.
 - Public-REST Sleeper client, 14-source audit/backfill, compact snapshots, and idempotent import.
 - Scheduled 30-minute sync with D1 lease, payload hashing, bounded writes, run logging, and stale-data behavior.
 - Season archive/detail, weekly scoreboard, matchup/lineup, manager, rivalry, player, record, about, JSON, and health routes.
-- All 15 named record definitions, standings, brackets, review gates, source provenance, and correction visibility.
+- All 25 named record definitions, actual and all-play standings, brackets, review gates, source provenance, and correction visibility.
+- Full league timeline and team-name museum for 2013 onward.
+- Public Sleeper-era history containing 8 drafts, 1,068 picks, and 2,734 transaction facts across the configured 2021–2026 sources.
 - A reproducible manager Elo model (1500 baseline, K=20) and responsive SVG history chart on every manager profile, using only canonical games.
 - Reviewed cross-provider identity registry combining the 16 owner-confirmed Yahoo/Sleeper manager pairs without display-name inference. Career totals, championships, rivalries, player history, and co-managed teams now share canonical people across provider eras.
 - Reviewed 2021 and 2022 multi-conference seasons with four explicit stitched Week 17 title games, complete roster mappings, and approved outcomes included in career totals.
 - Reviewed 2023 Week 14 correction selecting populated platform scores over the source's anomalous all-zero `custom_points` values; canonical and remote-import validation require zero finalized ties.
 - Sleeper postseason brackets are reduced to owner-approved meaningful paths: championship progression, the five-game inverse-bye last-place path, and the final third-place game. Six noncompetitive placement games per single-league 2023–2025 season remain auditable but are excluded from every page and statistic.
-- Local D1 seeded with 14 seasons, 210 canonical teams, 23 canonical people, 1,072 players, 1,668 matchups, and 45,853 lineup entries; canonical validation and foreign-key checks pass.
-- Strict typecheck, lint, 69 unit/integration tests, production build, and 20 Playwright browser tests pass. Browser coverage stays focused on desktop/mobile behavior, Axe accessibility checks, keyboard navigation, sortable tables, week-to-week score replacement, required routes/JSON resources, live polling and failure retention, zero-ties enforcement, review gates, search, and overflow.
-- The two large historical SQL imports are split into 244 ordered, checksummed, restart-safe D1 chunks containing 97,035 statements. CI rehearses every chunk against a clean database and requires canonical counts, integrity, foreign keys, and zero finalized ties before production import is permitted.
+- Local D1 seeded with 14 seasons, 210 canonical teams, 23 canonical people, 1,076 players, 1,668 matchups, 45,853 lineup entries, 8 drafts, 1,068 draft picks, and 2,734 transactions; canonical validation and foreign-key checks pass.
+- Strict typecheck, lint, 81 unit/integration tests, production build, and 20 focused Playwright browser tests pass.
+- The two large historical SQL imports are split into 298 ordered, checksummed, restart-safe D1 chunks containing 118,965 statements. CI rehearses every chunk against a clean database and requires canonical counts, integrity, foreign keys, and zero finalized ties before production import is permitted.
 - A production release checker blocks deployment while historical reviews, participating identities, D1 configuration, credential-revocation acknowledgements, or a confirmed production sync path remain incomplete. Post-deployment verification requires HTTPS SSR content, healthy status, seeded JSON/ETag behavior, and an in-season successful operational sync.
 
 Production status:
@@ -887,7 +937,7 @@ The initial release is complete only when all of the following are true:
 - 2021 source topology has explicit human approval.
 - 2022–2025 Sleeper seasons are complete.
 - 2026 is configured as the active season.
-- The site includes seasons, standings, brackets, weekly matchups, lineup details, managers, rivalries, players, and all 15 record categories.
+- The site includes seasons, actual and all-play standings, brackets, weekly matchups, lineup details, managers, rivalries, players, all 25 record categories, the league timeline, Sleeper-era drafts and transactions, and the team-name museum.
 - The zero-ties invariant, byes, postseason phases, and co-managers behave according to this specification.
 - The scheduled sync is idempotent and runs every 30 minutes during relevant periods.
 - Live data visibly reports freshness and stale state.

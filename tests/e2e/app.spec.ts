@@ -146,6 +146,11 @@ test("every public route and JSON status resource returns seeded content", async
     ["/players/player-7e8f1854adc28571f9cb", "Just 2 Guys appearances"],
     ["/records", "Records"],
     ["/records/most-wins", "Most Wins"],
+    ["/history", "League history"],
+    ["/history/all-play?year=2025", "All-play standings"],
+    ["/history/drafts?year=2025", "Draft archive"],
+    ["/history/transactions?year=2025&type=trade", "Transaction wire"],
+    ["/history/team-names", "Team-name museum"],
     ["/about", "About the archive"],
   ] as const;
   for (const [path, text] of pages) {

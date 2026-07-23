@@ -12,6 +12,7 @@ The durable product and data decisions live in [SPEC.md](./SPEC.md). Read it bef
 - A 30-minute Worker cron during active seasons
 - Immutable SQLite input for the complete Yahoo-era archive
 - Version-controlled JSON manifests for every season from 2013 onward
+- Full all-play standings, league timeline, team-name museum, and Sleeper-era draft/transaction archive
 - Custom responsive CSS; no runtime CSS or font CDN
 
 Yahoo network code, browser cookies, Sleeper authentication, and private Sleeper endpoints are intentionally not used.
@@ -75,7 +76,9 @@ Manager profiles also include an Elo history derived from those same canonical g
 npm run backfill:sleeper
 ```
 
-The backfill validates upstream payloads, fetches only configured league IDs, stores compact source snapshots, resolves only referenced players, and generates an idempotent SQL import plus reconciliation reports.
+The backfill validates upstream payloads, fetches only configured league IDs, stores compact source snapshots, resolves only referenced players, and generates an idempotent SQL import plus reconciliation reports. It includes public draft boards and transactions for enabled full-league Sleeper sources. The frozen archive currently contains 8 drafts, 1,068 picks, and 2,734 transaction facts; the public transaction wire shows completed moves by default.
+
+Yahoo draft and transaction history is unavailable because the immutable legacy database contains no corresponding source tables. The site labels this history as Sleeper-era coverage rather than inventing or inferring those facts.
 
 The compact public-API snapshot is version controlled so a fresh checkout can rebuild and test the full archive without network access. Generated SQL and reports remain reproducible and are not committed.
 

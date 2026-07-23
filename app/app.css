@@ -1206,6 +1206,348 @@ tbody th small {
 .record-value {
   font: 900 1.25rem var(--mono);
 }
+.history-nav {
+  display: flex;
+  gap: 6px;
+  margin: 34px 0 44px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.history-nav a {
+  flex: none;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  background: var(--paper-bright);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+.history-nav a.active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: white;
+}
+.history-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 64px;
+}
+.history-feature-grid a {
+  min-height: 125px;
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: var(--paper-bright);
+  text-decoration: none;
+}
+.history-feature-grid strong {
+  font: 800 1.3rem var(--serif);
+}
+.history-feature-grid span {
+  margin-top: auto;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+.league-timeline {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.league-timeline::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 71px;
+  width: 1px;
+  background: var(--line);
+}
+.league-timeline > li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  gap: 28px;
+  padding-bottom: 18px;
+}
+.timeline-year {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  padding: 7px 0;
+  background: var(--paper);
+  color: var(--orange-dark);
+  font: 900 1.35rem var(--mono);
+}
+.timeline-year::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  right: 29px;
+  width: 11px;
+  height: 11px;
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  background: var(--ink);
+}
+.league-timeline article {
+  padding: 24px;
+  border-top: 4px solid var(--ink);
+  background: var(--paper-bright);
+}
+.timeline-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+}
+.timeline-heading h2 {
+  margin: 0;
+  font: 800 clamp(1.4rem, 3vw, 2rem) var(--serif);
+}
+.timeline-heading > span,
+.timeline-pending {
+  color: var(--muted);
+  font: 750 0.68rem var(--mono);
+  text-transform: uppercase;
+}
+.league-timeline article > p {
+  max-width: 760px;
+  margin: 12px 0 20px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+.league-timeline dl {
+  display: flex;
+  gap: 34px;
+  margin: 0;
+}
+.league-timeline dl div {
+  display: flex;
+  gap: 7px;
+}
+.league-timeline dt {
+  color: var(--muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+.league-timeline dd {
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+.history-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.history-toolbar > p {
+  max-width: 600px;
+  margin: 0;
+  color: var(--muted);
+}
+.history-toolbar form {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+.history-toolbar label span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 0.63rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.history-toolbar select,
+.history-toolbar button {
+  min-height: 39px;
+  padding: 8px 11px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--paper-bright);
+  color: var(--ink);
+  font: 750 0.78rem var(--sans);
+}
+.history-toolbar button {
+  background: var(--ink);
+  color: white;
+  cursor: pointer;
+}
+.history-method {
+  max-width: 760px;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+.all-play-table td small,
+.draft-table td small,
+.draft-table th small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.66rem;
+}
+.number-positive {
+  color: #176b49;
+  font-weight: 850;
+}
+.number-negative {
+  color: var(--orange-dark);
+  font-weight: 850;
+}
+.draft-archive {
+  display: grid;
+  gap: 72px;
+}
+.draft-archive section > .section-heading > strong {
+  color: var(--muted);
+  font: 800 0.78rem var(--mono);
+}
+.transaction-list {
+  display: grid;
+  gap: 10px;
+}
+.transaction-list article {
+  border: 1px solid var(--line);
+  background: var(--paper-bright);
+}
+.transaction-list article > header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.transaction-list header span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--orange-dark);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.transaction-list header strong {
+  font: 800 1.05rem var(--serif);
+}
+.transaction-list time {
+  color: var(--muted);
+  font: 750 0.68rem var(--mono);
+  white-space: nowrap;
+}
+.transaction-items {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+.transaction-items a {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 8px;
+  padding: 11px 16px;
+  border-bottom: 1px solid #e1d9ca;
+  text-decoration: none;
+}
+.transaction-items a:nth-child(odd) {
+  border-right: 1px solid #e1d9ca;
+}
+.transaction-items b {
+  font: 900 1rem var(--mono);
+}
+.transaction-add {
+  color: #176b49;
+}
+.transaction-drop {
+  color: var(--orange-dark);
+}
+.transaction-items span strong,
+.transaction-items span small {
+  display: block;
+}
+.transaction-items span small {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.67rem;
+}
+.history-pager {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-top: 28px;
+  padding-block: 14px;
+  border-block: 1px solid var(--line);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+.history-pager > :last-child {
+  justify-self: end;
+}
+.museum-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.museum-grid > article {
+  align-self: start;
+  border-top: 5px solid var(--ink);
+  background: var(--paper-bright);
+}
+.museum-grid article > header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.museum-grid h2 {
+  margin: 0;
+  font: 800 1.7rem var(--serif);
+}
+.museum-grid header span {
+  color: var(--muted);
+  font: 800 0.68rem var(--mono);
+}
+.museum-grid ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.museum-grid li {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 11px 20px;
+  border-bottom: 1px solid #e1d9ca;
+}
+.museum-grid img,
+.museum-monogram {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--acid);
+  object-fit: cover;
+  font: 850 0.67rem var(--mono);
+}
+.museum-grid li strong,
+.museum-grid li small {
+  display: block;
+}
+.museum-grid li small {
+  margin-top: 3px;
+  color: var(--muted);
+  font: 700 0.67rem var(--mono);
+}
 .prose-page {
   max-width: 900px;
 }
@@ -1328,13 +1670,25 @@ tbody th small {
   .lineup-group h3 {
     top: 64px;
   }
+  .history-feature-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .history-toolbar {
+    display: block;
+  }
+  .history-toolbar form {
+    margin-top: 18px;
+  }
+  .museum-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 520px) {
   .wrap {
     width: min(100% - 22px, 1180px);
   }
-  .site-header nav a:nth-child(4) {
+  .site-header nav a:nth-child(5) {
     display: none;
   }
   .season-strip {
@@ -1380,6 +1734,43 @@ tbody th small {
   }
   .site-footer a {
     margin-left: 0;
+  }
+  .history-feature-grid,
+  .transaction-items {
+    grid-template-columns: 1fr;
+  }
+  .league-timeline::before {
+    left: 0;
+  }
+  .league-timeline > li {
+    display: block;
+    padding-left: 18px;
+  }
+  .timeline-year {
+    position: relative;
+    top: auto;
+  }
+  .timeline-year::after {
+    left: -23px;
+    right: auto;
+  }
+  .timeline-heading {
+    display: block;
+  }
+  .timeline-heading > span {
+    display: block;
+    margin-top: 5px;
+  }
+  .league-timeline dl {
+    display: grid;
+    gap: 6px;
+  }
+  .history-toolbar form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .transaction-items a:nth-child(odd) {
+    border-right: 0;
   }
 }
 

@@ -2,11 +2,14 @@ import { z } from "zod";
 
 import {
   sleeperBracketMatchSchema,
+  sleeperDraftPickSchema,
+  sleeperDraftSchema,
   sleeperLeagueSchema,
   sleeperMatchupSchema,
   sleeperNflStateSchema,
   sleeperPlayersSchema,
   sleeperRosterSchema,
+  sleeperTransactionSchema,
   sleeperUserSchema,
 } from "./schemas";
 
@@ -140,6 +143,27 @@ export class SleeperClient {
         .array(sleeperBracketMatchSchema)
         .nullable()
         .transform((matches) => matches ?? []),
+    );
+  }
+
+  drafts(leagueId: string) {
+    return this.request(
+      `/league/${encodeURIComponent(leagueId)}/drafts`,
+      z.array(sleeperDraftSchema),
+    );
+  }
+
+  draftPicks(draftId: string) {
+    return this.request(
+      `/draft/${encodeURIComponent(draftId)}/picks`,
+      z.array(sleeperDraftPickSchema),
+    );
+  }
+
+  transactions(leagueId: string, week: number) {
+    return this.request(
+      `/league/${encodeURIComponent(leagueId)}/transactions/${week}`,
+      z.array(sleeperTransactionSchema),
     );
   }
 

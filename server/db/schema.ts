@@ -352,6 +352,141 @@ export const lineupEntries = sqliteTable(
   ],
 );
 
+export const drafts = sqliteTable(
+  "drafts",
+  {
+    id: text("id").primaryKey(),
+    seasonSourceId: text("season_source_id")
+      .notNull()
+      .references(() => seasonSources.id, { onDelete: "cascade" }),
+    externalId: text("external_id").notNull(),
+    status: text("status").notNull(),
+    type: text("type").notNull(),
+    rounds: integer("rounds").notNull(),
+    teams: integer("teams").notNull(),
+    startedAt: text("started_at"),
+    completedAt: text("completed_at"),
+    metadataJson: text("metadata_json"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("drafts_source_external_unique").on(
+      table.seasonSourceId,
+      table.externalId,
+    ),
+    index("drafts_source_idx").on(table.seasonSourceId),
+  ],
+);
+
+export const draftPicks = sqliteTable(
+  "draft_picks",
+  {
+    id: text("id").primaryKey(),
+    draftId: text("draft_id")
+      .notNull()
+      .references(() => drafts.id, { onDelete: "cascade" }),
+    pickNumber: integer("pick_number").notNull(),
+    round: integer("round").notNull(),
+    draftSlot: integer("draft_slot").notNull(),
+    playerId: text("player_id")
+      .notNull()
+      .references(() => players.id, { onDelete: "restrict" }),
+    seasonTeamId: text("season_team_id").references(() => seasonTeams.id, {
+      onDelete: "set null",
+    }),
+    providerAccountId: text("provider_account_id").references(
+      () => providerAccounts.id,
+      { onDelete: "set null" },
+    ),
+    keeper: integer("keeper", { mode: "boolean" }).notNull().default(false),
+    metadataJson: text("metadata_json"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("draft_picks_draft_number_unique").on(
+      table.draftId,
+      table.pickNumber,
+    ),
+    index("draft_picks_player_idx").on(table.playerId),
+    index("draft_picks_team_idx").on(table.seasonTeamId),
+  ],
+);
+
+export const transactions = sqliteTable(
+  "league_transactions",
+  {
+    id: text("id").primaryKey(),
+    seasonSourceId: text("season_source_id")
+      .notNull()
+      .references(() => seasonSources.id, { onDelete: "cascade" }),
+    externalId: text("external_id").notNull(),
+    type: text("type").notNull(),
+    status: text("status").notNull(),
+    week: integer("week").notNull(),
+    creatorProviderAccountId: text("creator_provider_account_id").references(
+      () => providerAccounts.id,
+      { onDelete: "set null" },
+    ),
+    createdAtProvider: text("created_at_provider").notNull(),
+    statusUpdatedAt: text("status_updated_at"),
+    metadataJson: text("metadata_json"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("league_transactions_source_external_unique").on(
+      table.seasonSourceId,
+      table.externalId,
+    ),
+    index("league_transactions_source_week_idx").on(
+      table.seasonSourceId,
+      table.week,
+    ),
+  ],
+);
+
+export const transactionRosters = sqliteTable(
+  "transaction_rosters",
+  {
+    transactionId: text("transaction_id")
+      .notNull()
+      .references(() => transactions.id, { onDelete: "cascade" }),
+    seasonTeamId: text("season_team_id")
+      .notNull()
+      .references(() => seasonTeams.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    primaryKey({ columns: [table.transactionId, table.seasonTeamId] }),
+    index("transaction_rosters_team_idx").on(table.seasonTeamId),
+  ],
+);
+
+export const transactionItems = sqliteTable(
+  "transaction_items",
+  {
+    id: text("id").primaryKey(),
+    transactionId: text("transaction_id")
+      .notNull()
+      .references(() => transactions.id, { onDelete: "cascade" }),
+    seasonTeamId: text("season_team_id").references(() => seasonTeams.id, {
+      onDelete: "set null",
+    }),
+    playerId: text("player_id")
+      .notNull()
+      .references(() => players.id, { onDelete: "restrict" }),
+    action: text("action", { enum: ["add", "drop"] }).notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("transaction_items_fact_unique").on(
+      table.transactionId,
+      table.playerId,
+      table.action,
+    ),
+    index("transaction_items_player_idx").on(table.playerId),
+    index("transaction_items_team_idx").on(table.seasonTeamId),
+  ],
+);
+
 export const syncRuns = sqliteTable(
   "sync_runs",
   {

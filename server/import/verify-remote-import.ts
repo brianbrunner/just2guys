@@ -1,4 +1,4 @@
-import { readFile, rm } from "node:fs/promises";
+import { readFile, readdir, rm } from "node:fs/promises";
 import { DatabaseSync } from "node:sqlite";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,27 +15,35 @@ interface RemoteImportManifest {
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const importDir = resolve(projectRoot, "generated/remote-import");
 const rehearsalPath = resolve(importDir, "rehearsal.sqlite");
+const rehearsalFiles = [
+  rehearsalPath,
+  `${rehearsalPath}-journal`,
+  `${rehearsalPath}-shm`,
+  `${rehearsalPath}-wal`,
+];
 const expectedCounts = {
   seasons: 14,
   teams: 210,
   people: 23,
-  players: 1072,
+  players: 1076,
   matchups: 1668,
   lineups: 45853,
+  drafts: 8,
+  draftPicks: 1068,
+  transactions: 2734,
 };
 
-await rm(rehearsalPath, { force: true });
+await Promise.all(rehearsalFiles.map((path) => rm(path, { force: true })));
 const database = new DatabaseSync(rehearsalPath);
 try {
-  database.exec(
-    await readFile(
-      resolve(
-        projectRoot,
-        "server/db/migrations/0000_friendly_tyger_tiger.sql",
-      ),
-      "utf8",
-    ),
-  );
+  const migrationsDirectory = resolve(projectRoot, "server/db/migrations");
+  for (const migration of (await readdir(migrationsDirectory))
+    .filter((name) => name.endsWith(".sql"))
+    .sort()) {
+    database.exec(
+      await readFile(resolve(migrationsDirectory, migration), "utf8"),
+    );
+  }
   const manifest = JSON.parse(
     await readFile(resolve(importDir, "manifest.json"), "utf8"),
   ) as RemoteImportManifest;
@@ -52,7 +60,10 @@ try {
         (SELECT COUNT(*) FROM people) people,
         (SELECT COUNT(*) FROM players) players,
         (SELECT COUNT(*) FROM matchups) matchups,
-        (SELECT COUNT(*) FROM lineup_entries) lineups`,
+        (SELECT COUNT(*) FROM lineup_entries) lineups,
+        (SELECT COUNT(*) FROM drafts) drafts,
+        (SELECT COUNT(*) FROM draft_picks) draftPicks,
+        (SELECT COUNT(*) FROM league_transactions) transactions`,
     )
     .get() as Record<keyof typeof expectedCounts, number>;
   for (const [name, expected] of Object.entries(expectedCounts)) {
@@ -93,5 +104,5 @@ try {
   );
 } finally {
   database.close();
-  await rm(rehearsalPath, { force: true });
+  await Promise.all(rehearsalFiles.map((path) => rm(path, { force: true })));
 }

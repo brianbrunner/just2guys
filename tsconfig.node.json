@@ -10,6 +10,7 @@
     "server/import/**/*",
     "server/identity/**/*",
     "server/domain/dataset.ts",
+    "server/domain/all-play.ts",
     "server/domain/elo.ts",
     "server/domain/records.ts",
     "server/domain/standings.ts",

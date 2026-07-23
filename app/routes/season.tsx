@@ -96,6 +96,14 @@ export default function Season({ loaderData }: Route.ComponentProps) {
                     .join(" → ")}`}
             </p>
           </div>
+          {season.status === "complete" && (
+            <Link
+              className="text-link"
+              to={`/history/all-play?year=${season.year}`}
+            >
+              All-play table →
+            </Link>
+          )}
         </div>
         <StandingsTable rows={standings} year={season.year} />
       </section>

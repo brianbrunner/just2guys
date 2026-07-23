@@ -10,12 +10,20 @@ import {
 } from "../sleeper/adapter";
 import type {
   SleeperBracketMatch,
+  SleeperDraft,
+  SleeperDraftPick,
   SleeperLeague,
   SleeperMatchup,
   SleeperPlayer,
   SleeperRoster,
+  SleeperTransaction,
   SleeperUser,
 } from "../sleeper/schemas";
+
+export interface SleeperDraftSnapshot {
+  draft: SleeperDraft;
+  picks: SleeperDraftPick[];
+}
 
 export interface SleeperSnapshot {
   year: number;
@@ -26,6 +34,8 @@ export interface SleeperSnapshot {
   winnersBracket: SleeperBracketMatch[];
   losersBracket: SleeperBracketMatch[];
   weeks: { week: number; matchups: SleeperMatchup[] }[];
+  drafts?: SleeperDraftSnapshot[];
+  transactions?: SleeperTransaction[];
   contentHash: string;
 }
 
@@ -83,6 +93,50 @@ function playerName(playerId: string, player?: SleeperPlayer) {
   );
 }
 
+function appendPlayerStatements(
+  statements: string[],
+  playerId: string,
+  player: SleeperPlayer | undefined,
+) {
+  const position =
+    player?.position || (playerId.length <= 3 ? "DEF" : "UNKNOWN");
+  const isDefense = position === "DEF" || /^[A-Z]{2,3}$/.test(playerId);
+  const playerCanonicalId = stableId("player", `sleeper:${playerId}`);
+  statements.push(
+    insert(
+      "players",
+      {
+        id: playerCanonicalId,
+        name: playerName(playerId, player),
+        position,
+        nfl_team: player?.team ?? (isDefense ? playerId : null),
+        image_url: isDefense
+          ? null
+          : safeImageUrl(
+              `https://sleepercdn.com/content/nfl/players/thumb/${playerId}.jpg`,
+            ),
+        is_defense: isDefense,
+        active: player?.active ?? false,
+      },
+      ["id"],
+      ["name", "position", "nfl_team", "image_url", "is_defense", "active"],
+    ),
+    insert(
+      "provider_players",
+      {
+        id: stableId("provider-player", `sleeper:${playerId}`),
+        provider: "sleeper",
+        external_id: playerId,
+        player_id: playerCanonicalId,
+        metadata_json: null,
+      },
+      ["provider", "external_id"],
+      ["player_id"],
+    ),
+  );
+  return playerCanonicalId;
+}
+
 function appendLineupStatements(input: {
   statements: string[];
   side: SleeperMatchup;
@@ -114,39 +168,12 @@ function appendLineupStatements(input: {
     const player = input.players[playerId];
     const position =
       player?.position || (playerId.length <= 3 ? "DEF" : "UNKNOWN");
-    const isDefense = position === "DEF" || /^[A-Z]{2,3}$/.test(playerId);
-    const playerCanonicalId = stableId("player", `sleeper:${playerId}`);
+    const playerCanonicalId = appendPlayerStatements(
+      input.statements,
+      playerId,
+      player,
+    );
     input.statements.push(
-      insert(
-        "players",
-        {
-          id: playerCanonicalId,
-          name: playerName(playerId, player),
-          position,
-          nfl_team: player?.team ?? (isDefense ? playerId : null),
-          image_url: isDefense
-            ? null
-            : safeImageUrl(
-                `https://sleepercdn.com/content/nfl/players/thumb/${playerId}.jpg`,
-              ),
-          is_defense: isDefense,
-          active: player?.active ?? false,
-        },
-        ["id"],
-        ["name", "position", "nfl_team", "image_url", "is_defense", "active"],
-      ),
-      insert(
-        "provider_players",
-        {
-          id: stableId("provider-player", `sleeper:${playerId}`),
-          provider: "sleeper",
-          external_id: playerId,
-          player_id: playerCanonicalId,
-          metadata_json: null,
-        },
-        ["provider", "external_id"],
-        ["player_id"],
-      ),
       insert(
         "lineup_entries",
         {
@@ -335,6 +362,13 @@ export function buildSleeperImportSql(input: {
     const seasonId = `season-${snapshot.year}`;
     const sourceId = stableId("source", `sleeper:${snapshot.league.league_id}`);
     const users = new Map(snapshot.users.map((user) => [user.user_id, user]));
+    const rosterAccountExternalIds = new Set(
+      snapshot.rosters.flatMap((roster) =>
+        [roster.owner_id, ...(roster.co_owners ?? [])].filter(
+          (id): id is string => Boolean(id),
+        ),
+      ),
+    );
     const seasonTeamIds = new Map<number, string>();
     const sourceRosterIds = new Map<number, string>();
 
@@ -477,6 +511,179 @@ export function buildSleeperImportSql(input: {
             ["role"],
           ),
         );
+      }
+    }
+
+    for (const draftSnapshot of snapshot.drafts ?? []) {
+      const draftId = stableId(
+        "draft",
+        `sleeper:${draftSnapshot.draft.draft_id}`,
+      );
+      statements.push(
+        insert(
+          "drafts",
+          {
+            id: draftId,
+            season_source_id: sourceId,
+            external_id: draftSnapshot.draft.draft_id,
+            status: draftSnapshot.draft.status,
+            type: draftSnapshot.draft.type,
+            rounds: draftSnapshot.draft.settings.rounds,
+            teams: draftSnapshot.draft.settings.teams,
+            started_at: draftSnapshot.draft.start_time
+              ? new Date(draftSnapshot.draft.start_time).toISOString()
+              : null,
+            completed_at: draftSnapshot.draft.last_picked
+              ? new Date(draftSnapshot.draft.last_picked).toISOString()
+              : null,
+            metadata_json: JSON.stringify(draftSnapshot.draft.metadata ?? {}),
+          },
+          ["season_source_id", "external_id"],
+          [
+            "status",
+            "type",
+            "rounds",
+            "teams",
+            "started_at",
+            "completed_at",
+            "metadata_json",
+          ],
+        ),
+      );
+      for (const pick of draftSnapshot.picks) {
+        const playerCanonicalId = appendPlayerStatements(
+          statements,
+          pick.player_id,
+          input.players[pick.player_id],
+        );
+        statements.push(
+          insert(
+            "draft_picks",
+            {
+              id: stableId(
+                "draft-pick",
+                `${draftSnapshot.draft.draft_id}:${pick.pick_no}`,
+              ),
+              draft_id: draftId,
+              pick_number: pick.pick_no,
+              round: pick.round,
+              draft_slot: pick.draft_slot,
+              player_id: playerCanonicalId,
+              season_team_id: pick.roster_id
+                ? (seasonTeamIds.get(pick.roster_id) ?? null)
+                : null,
+              provider_account_id:
+                pick.picked_by && rosterAccountExternalIds.has(pick.picked_by)
+                  ? stableId("account", `sleeper:${pick.picked_by}`)
+                  : null,
+              keeper: Boolean(
+                pick.is_keeper &&
+                pick.is_keeper !== "0" &&
+                pick.is_keeper !== 0,
+              ),
+              metadata_json: JSON.stringify(pick.metadata ?? {}),
+            },
+            ["draft_id", "pick_number"],
+            [
+              "round",
+              "draft_slot",
+              "player_id",
+              "season_team_id",
+              "provider_account_id",
+              "keeper",
+              "metadata_json",
+            ],
+          ),
+        );
+      }
+    }
+
+    for (const transaction of snapshot.transactions ?? []) {
+      const transactionId = stableId(
+        "transaction",
+        `sleeper:${transaction.transaction_id}`,
+      );
+      statements.push(
+        insert(
+          "league_transactions",
+          {
+            id: transactionId,
+            season_source_id: sourceId,
+            external_id: transaction.transaction_id,
+            type: transaction.type,
+            status: transaction.status,
+            week: transaction.leg,
+            creator_provider_account_id:
+              transaction.creator &&
+              rosterAccountExternalIds.has(transaction.creator)
+                ? stableId("account", `sleeper:${transaction.creator}`)
+                : null,
+            created_at_provider: new Date(transaction.created).toISOString(),
+            status_updated_at: transaction.status_updated
+              ? new Date(transaction.status_updated).toISOString()
+              : null,
+            metadata_json: JSON.stringify({
+              metadata: transaction.metadata ?? null,
+              settings: transaction.settings ?? null,
+              waiverBudget: transaction.waiver_budget,
+              draftPicks: transaction.draft_picks,
+            }),
+          },
+          ["season_source_id", "external_id"],
+          [
+            "type",
+            "status",
+            "week",
+            "creator_provider_account_id",
+            "created_at_provider",
+            "status_updated_at",
+            "metadata_json",
+          ],
+        ),
+      );
+      for (const rosterId of transaction.roster_ids) {
+        const seasonTeamId = seasonTeamIds.get(rosterId);
+        if (!seasonTeamId) continue;
+        statements.push(
+          insert(
+            "transaction_rosters",
+            {
+              transaction_id: transactionId,
+              season_team_id: seasonTeamId,
+            },
+            ["transaction_id", "season_team_id"],
+            [],
+          ),
+        );
+      }
+      for (const [action, playerRosterIds] of [
+        ["add", transaction.adds],
+        ["drop", transaction.drops],
+      ] as const) {
+        for (const [playerId, rosterId] of Object.entries(playerRosterIds)) {
+          const playerCanonicalId = appendPlayerStatements(
+            statements,
+            playerId,
+            input.players[playerId],
+          );
+          statements.push(
+            insert(
+              "transaction_items",
+              {
+                id: stableId(
+                  "transaction-item",
+                  `${transaction.transaction_id}:${action}:${playerId}`,
+                ),
+                transaction_id: transactionId,
+                season_team_id: seasonTeamIds.get(rosterId) ?? null,
+                player_id: playerCanonicalId,
+                action,
+              },
+              ["transaction_id", "player_id", "action"],
+              ["season_team_id"],
+            ),
+          );
+        }
       }
     }
 

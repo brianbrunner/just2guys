@@ -74,20 +74,21 @@ function makeSide(
 
 const sides: DomainSide[] = Array.from({ length: 20 }, (_, index) => {
   const game = index + 1;
+  const brianWins = game === 20;
   return [
     makeSide(
       game,
       alex,
       game === 1 ? 69.5 : 120 + game,
-      "win",
-      game === 20 ? "winners" : "regular",
+      brianWins ? "loss" : "win",
+      game >= 19 ? "winners" : "regular",
     ),
     makeSide(
       game,
       brian,
-      80 + game,
-      "loss",
-      game === 20 ? "winners" : "regular",
+      brianWins ? 160 : 80 + game,
+      brianWins ? "win" : "loss",
+      game >= 19 ? "winners" : "regular",
     ),
   ];
 }).flat();
@@ -143,9 +144,9 @@ const dataset: DomainDataset = {
 
 describe("record catalog", () => {
   it("keeps stable unique slugs", () => {
-    expect(recordDefinitions).toHaveLength(15);
+    expect(recordDefinitions).toHaveLength(25);
     expect(new Set(recordDefinitions.map((record) => record.slug)).size).toBe(
-      15,
+      25,
     );
   });
 
@@ -170,8 +171,8 @@ describe("record catalog", () => {
 
   it("uses a minimum of twenty decisions for manager percentage", () => {
     expect(calculateRecord(dataset, "best-manager-record")).toMatchObject([
-      { label: "Alex", valueLabel: "100.0%" },
-      { label: "Brian", valueLabel: "0.0%" },
+      { label: "Alex", valueLabel: "95.0%" },
+      { label: "Brian", valueLabel: "5.0%" },
     ]);
   });
 
@@ -181,7 +182,7 @@ describe("record catalog", () => {
       toYear: 2025,
       phase: "postseason",
     });
-    expect(filtered.sides).toHaveLength(2);
+    expect(filtered.sides).toHaveLength(4);
     expect(filtered.sides.every((side) => side.phase === "winners")).toBe(true);
     expect(filtered.lineups).toHaveLength(0);
   });
