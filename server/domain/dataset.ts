@@ -59,11 +59,22 @@ export interface DomainLineupEntry {
   managers: DomainManager[];
 }
 
+export interface DomainPlayerAcquisition {
+  id: string;
+  year: number;
+  week: number;
+  teamId: string;
+  playerId: string;
+  source: string;
+  occurredAt: string;
+}
+
 export interface DomainDataset {
   seasons: DomainSeason[];
   teams: DomainTeam[];
   sides: DomainSide[];
   lineups: DomainLineupEntry[];
+  acquisitions?: DomainPlayerAcquisition[];
 }
 
 interface TeamRow {
@@ -96,6 +107,7 @@ export async function loadDomainDataset(
     includeUnreviewed?: boolean;
     includeLive?: boolean;
     includeLineups?: boolean;
+    includeAcquisitions?: boolean;
     years?: number[];
   } = {},
 ): Promise<DomainDataset> {
@@ -116,8 +128,14 @@ export async function loadDomainDataset(
   const yearFilter = years.length
     ? ` AND s.year IN (${years.map(() => "?").join(", ")})`
     : "";
-  const [seasonResult, teamResult, managerResult, sideResult, lineupResult] =
-    await Promise.all([
+  const [
+    seasonResult,
+    teamResult,
+    managerResult,
+    sideResult,
+    lineupResult,
+    acquisitionResult,
+  ] = await Promise.all([
       allForYears<{
         id: string;
         year: number;
@@ -215,6 +233,50 @@ export async function loadDomainDataset(
          WHERE ${seasonFilter} AND ${matchupFilter} AND ${meaningfulMatchupFilter}${yearFilter}`,
             years,
           ),
+      options.includeAcquisitions
+        ? database
+            .prepare(
+              `SELECT 'draft:' || dp.id id, s.year, 0 week,
+                      dp.season_team_id team_id, dp.player_id, 'draft' source,
+                      COALESCE(d.completed_at, d.started_at, '') occurred_at
+               FROM draft_picks dp
+               JOIN drafts d ON d.id = dp.draft_id
+               JOIN season_sources ss ON ss.id = d.season_source_id
+               JOIN seasons s ON s.id = ss.season_id
+               WHERE s.visible = 1 AND s.status = 'complete'
+                 AND d.status = 'complete' AND dp.season_team_id IS NOT NULL
+               UNION ALL
+               SELECT 'transaction:' || ti.id id, s.year, lt.week,
+                      ti.season_team_id team_id, ti.player_id, lt.type source,
+                      lt.created_at_provider occurred_at
+               FROM transaction_items ti
+               JOIN league_transactions lt ON lt.id = ti.transaction_id
+               JOIN season_sources ss ON ss.id = lt.season_source_id
+               JOIN seasons s ON s.id = ss.season_id
+               WHERE s.visible = 1 AND s.status = 'complete'
+                 AND lt.status = 'complete' AND ti.action = 'add'
+                 AND ti.season_team_id IS NOT NULL`,
+            )
+            .all<{
+              id: string;
+              year: number;
+              week: number;
+              team_id: string;
+              player_id: string;
+              source: string;
+              occurred_at: string;
+            }>()
+        : Promise.resolve({
+            results: [] as Array<{
+              id: string;
+              year: number;
+              week: number;
+              team_id: string;
+              player_id: string;
+              source: string;
+              occurred_at: string;
+            }>,
+          }),
     ]);
   const managersByTeam = new Map<string, DomainManager[]>();
   for (const row of managerResult.results) {
@@ -274,5 +336,16 @@ export async function loadDomainDataset(
       points: row.points,
       managers: managersByTeam.get(row.team_id) ?? [],
     })),
+    acquisitions: acquisitionResult.results
+      .filter((row) => years.length === 0 || years.includes(row.year))
+      .map((row) => ({
+        id: row.id,
+        year: row.year,
+        week: row.week,
+        teamId: row.team_id,
+        playerId: row.player_id,
+        source: row.source,
+        occurredAt: row.occurred_at,
+      })),
   };
 }

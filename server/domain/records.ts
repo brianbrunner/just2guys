@@ -230,6 +230,25 @@ export const recordDefinitions: RecordDefinition[] = [
     direction: "desc",
     supportsPhase: false,
   }),
+  defineRecord({
+    slug: "draft-class",
+    name: "Draft Class",
+    description: "Most starter points in a season from players the team drafted.",
+    eligibility:
+      "Sleeper seasons only; each scoring week uses the player's latest acquisition source.",
+    direction: "desc",
+    supportsPhase: false,
+  }),
+  defineRecord({
+    slug: "off-the-wire",
+    name: "Off the Wire",
+    description:
+      "Most starter points in a season from waiver and free-agent pickups.",
+    eligibility:
+      "Completed Sleeper adds only; points count after the pickup while the player is on that team.",
+    direction: "desc",
+    supportsPhase: false,
+  }),
 ];
 
 export type RecordPhase =
@@ -261,6 +280,9 @@ export function filterRecordDataset(
     ),
     lineups: dataset.lineups.filter(
       (entry) => inYearRange(entry.year) && inPhase(entry.phase),
+    ),
+    acquisitions: dataset.acquisitions?.filter((entry) =>
+      inYearRange(entry.year),
     ),
   };
 }
@@ -850,6 +872,76 @@ export function calculateRecord(
             href: `/seasons/${team.year}`,
           },
         ];
+      }),
+      "desc",
+    );
+  }
+  if (slug === "draft-class" || slug === "off-the-wire") {
+    const acquisitions = new Map<
+      string,
+      NonNullable<DomainDataset["acquisitions"]>
+    >();
+    for (const event of dataset.acquisitions ?? []) {
+      const key = `${event.year}:${event.teamId}:${event.playerId}`;
+      const events = acquisitions.get(key) ?? [];
+      events.push(event);
+      acquisitions.set(key, events);
+    }
+    for (const events of acquisitions.values()) {
+      events.sort(
+        (left, right) =>
+          left.week - right.week ||
+          left.occurredAt.localeCompare(right.occurredAt) ||
+          left.id.localeCompare(right.id),
+      );
+    }
+    const teams = new Map(dataset.teams.map((team) => [team.id, team]));
+    const totals = new Map<
+      string,
+      {
+        team: DomainDataset["teams"][number];
+        points: number;
+        players: Set<string>;
+      }
+    >();
+    for (const lineup of dataset.lineups.filter(
+      (entry) => entry.classification === "starter",
+    )) {
+      const events =
+        acquisitions.get(
+          `${lineup.year}:${lineup.teamId}:${lineup.playerId}`,
+        ) ?? [];
+      const latest = [...events]
+        .reverse()
+        .find((event) => event.week <= lineup.week);
+      const qualifies =
+        slug === "draft-class"
+          ? latest?.source === "draft"
+          : latest?.source === "waiver" || latest?.source === "free_agent";
+      if (!qualifies) continue;
+      const team = teams.get(lineup.teamId);
+      if (!team) continue;
+      const item = totals.get(team.id) ?? {
+        team,
+        points: 0,
+        players: new Set(),
+      };
+      item.points += lineup.points;
+      item.players.add(lineup.playerId);
+      totals.set(team.id, item);
+    }
+    return withRanks(
+      [...totals.values()].map((item) => {
+        const value = Math.round(item.points * 100) / 100;
+        return {
+          label: item.team.name,
+          detail: `${item.team.year} · ${item.team.managers
+            .map((manager) => manager.name)
+            .join(" & ")} · ${item.players.size} players`,
+          value,
+          valueLabel: `${value.toFixed(2)} points`,
+          href: `/seasons/${item.team.year}`,
+        };
       }),
       "desc",
     );

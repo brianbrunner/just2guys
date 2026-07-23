@@ -7,6 +7,7 @@ import {
 } from "./records";
 
 const RECORD_CACHE_VERSION = 1;
+const acquisitionRecordSlugs = new Set(["draft-class", "off-the-wire"]);
 
 function hasFilters(filters: RecordFilters) {
   return Boolean(filters.fromYear || filters.toYear || filters.phase);
@@ -49,7 +50,9 @@ export async function getRecordEntries(
     }
   }
 
-  const dataset = await loadDomainDataset(database);
+  const dataset = await loadDomainDataset(database, {
+    includeAcquisitions: acquisitionRecordSlugs.has(slug),
+  });
   const entries =
     slug === "giant-killer"
       ? calculateRecord(dataset, slug).filter(

@@ -4,6 +4,7 @@ import type {
   DomainDataset,
   DomainLineupEntry,
   DomainManager,
+  DomainPlayerAcquisition,
   DomainSide,
   DomainTeam,
 } from "../../server/domain/dataset";
@@ -122,8 +123,30 @@ const lineups: DomainLineupEntry[] = [
   ...Array.from({ length: 10 }, (_, index) =>
     lineup(`starter:${index}`, alex, "starter", "WR", 2),
   ),
+  lineup("waiver-starter", brian, "starter", "RB", 15),
   lineup("bench:1", brian, "bench", "RB", 41.5),
   lineup("bench:qb", brian, "bench", "QB", 50),
+];
+
+const acquisitions: DomainPlayerAcquisition[] = [
+  {
+    id: "draft:starter",
+    year: 2025,
+    week: 0,
+    teamId: teams[0].id,
+    playerId: "player:starter",
+    source: "draft",
+    occurredAt: "2025-08-20T00:00:00.000Z",
+  },
+  {
+    id: "waiver:starter",
+    year: 2025,
+    week: 1,
+    teamId: teams[1].id,
+    playerId: "player:starter",
+    source: "waiver",
+    occurredAt: "2025-09-03T00:00:00.000Z",
+  },
 ];
 
 const dataset: DomainDataset = {
@@ -140,13 +163,14 @@ const dataset: DomainDataset = {
   teams,
   sides,
   lineups,
+  acquisitions,
 };
 
 describe("record catalog", () => {
   it("keeps stable unique slugs", () => {
-    expect(recordDefinitions).toHaveLength(25);
+    expect(recordDefinitions).toHaveLength(27);
     expect(new Set(recordDefinitions.map((record) => record.slug)).size).toBe(
-      25,
+      27,
     );
   });
 
@@ -185,6 +209,47 @@ describe("record catalog", () => {
     expect(filtered.sides).toHaveLength(4);
     expect(filtered.sides.every((side) => side.phase === "winners")).toBe(true);
     expect(filtered.lineups).toHaveLength(0);
+  });
+
+  it("attributes starter points to the latest acquisition source", () => {
+    const sourceDataset: DomainDataset = {
+      ...dataset,
+      lineups: [
+        {
+          ...lineup("source-before", alex, "starter", "WR", 5),
+          week: 1,
+        },
+        {
+          ...lineup("source-after", alex, "starter", "WR", 9),
+          week: 3,
+        },
+        {
+          ...lineup("source-bench", alex, "bench", "WR", 100),
+          week: 3,
+          playerId: "player:starter",
+        },
+      ],
+      acquisitions: [
+        {
+          ...acquisitions[0],
+          teamId: teams[0].id,
+          week: 0,
+          source: "draft",
+        },
+        {
+          ...acquisitions[1],
+          teamId: teams[0].id,
+          week: 2,
+          source: "free_agent",
+        },
+      ],
+    };
+    expect(calculateRecord(sourceDataset, "draft-class")).toMatchObject([
+      { label: "Alpha", value: 5, valueLabel: "5.00 points" },
+    ]);
+    expect(calculateRecord(sourceDataset, "off-the-wire")).toMatchObject([
+      { label: "Alpha", value: 9, valueLabel: "9.00 points" },
+    ]);
   });
 
   it("credits each co-manager with the full team championship", () => {

@@ -562,6 +562,10 @@ Each record should support a stable slug and may support filters for season rang
 23. Playoff Mode — largest postseason scoring average increase over the same team’s regular-season average, requiring at least two meaningful postseason games.
 24. Cinderella Run — lowest regular-season seed to become canonical champion; grouped seasons use the champion’s conference seed.
 25. Roller Coaster — largest population standard deviation of regular-season team scores with at least 10 games.
+26. Draft Class — most starter points in one season from players whose latest acquisition by that team was its completed Sleeper draft.
+27. Off the Wire — most starter points in one season from players whose latest acquisition by that team was a completed Sleeper waiver or free-agent add.
+
+Draft Class and Off the Wire are available for Sleeper seasons beginning in 2021. A later acquisition supersedes an earlier source: for example, a drafted player who is dropped and reclaimed moves from draft credit to waiver credit for subsequent scoring weeks, while a traded player is credited to neither record after the trade.
 
 ### 11.4 Standings
 
@@ -815,7 +819,7 @@ The public UI should display stale data gracefully even when upstream Sleeper or
 - Playoff qualification versus consolation participation.
 - Championship and last-place derivation.
 - Co-manager attribution.
-- All 25 record definitions: the 15 preserved records plus Getting Away With It, Cursed, Heater, The Darkness, Giant Killer, Schedule Merchant, Schedule From Hell, Playoff Mode, Cinderella Run, and Roller Coaster.
+- All 27 record definitions: the 15 preserved records plus Getting Away With It, Cursed, Heater, The Darkness, Giant Killer, Schedule Merchant, Schedule From Hell, Playoff Mode, Cinderella Run, Roller Coaster, Draft Class, and Off the Wire.
 - Correct `Nice` scoring attribution.
 - Rivalry chronological ordering.
 - Bench and starter classification across Yahoo and Sleeper slot vocabularies.
@@ -841,7 +845,7 @@ Completed locally:
 - Public-REST Sleeper client, 14-source audit/backfill, compact snapshots, and idempotent import.
 - Scheduled 30-minute sync with D1 lease, payload hashing, bounded writes, run logging, and stale-data behavior.
 - Season archive/detail, weekly scoreboard, matchup/lineup, manager, rivalry, player, record, about, JSON, and health routes.
-- All 25 named record definitions, actual and all-play standings, brackets, review gates, source provenance, and correction visibility.
+- All 27 named record definitions, actual and all-play standings, brackets, review gates, source provenance, and correction visibility.
 - Full league timeline and team-name museum for 2013 onward.
 - Public Sleeper-era history containing 8 drafts, 1,068 picks, and 2,734 transaction facts across the configured 2021–2026 sources.
 - A reproducible manager Elo model (1500 baseline, K=20) and responsive SVG history chart on every manager profile, using only canonical games.
@@ -937,7 +941,7 @@ The initial release is complete only when all of the following are true:
 - 2021 source topology has explicit human approval.
 - 2022–2025 Sleeper seasons are complete.
 - 2026 is configured as the active season.
-- The site includes seasons, actual and all-play standings, brackets, weekly matchups, lineup details, managers, rivalries, players, all 25 record categories, the league timeline, Sleeper-era drafts and transactions, and the team-name museum.
+- The site includes seasons, actual and all-play standings, brackets, weekly matchups, lineup details, managers, rivalries, players, all 27 record categories, the league timeline, Sleeper-era drafts and transactions, and the team-name museum.
 - The zero-ties invariant, byes, postseason phases, and co-managers behave according to this specification.
 - The scheduled sync is idempotent and runs every 30 minutes during relevant periods.
 - Live data visibly reports freshness and stale state.
